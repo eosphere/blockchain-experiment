@@ -1,11 +1,10 @@
 
-## configex Project
-### Learning Objectives
+## Learning Objectives
 - Illustrate how to setup and manage a contract configuration singleton with a settings map.
 - Illustrate build process using ```cmake```
 - Illustrate how to test with ```eoslime```
 
-#### Learning Activities
+## Learning Activities
 - Clone the repo and investigate files to see how it works
 - Build the project using ```cmake```
 - Test the contract using ```nodeos```, ```eoslime```, and ```mocha```
@@ -13,7 +12,7 @@
 - Try out creating a new setting in the settings map using ```setsetting```
 - Write tests for your new features
 
-#### Creation / Init
+### Creation / Init
 This project was created using:
 ```
 eosio-init -project=configex -path=.
@@ -23,7 +22,7 @@ It uses ```cmake``` to build the project.
 
 The boilerplate project from ```eosio-init``` does not include a ```.gitignore``` file so I have added a useful one to the project.
 
-#### How to Build
+### How to Build
 
 1. Run ```cmake .```
 2. Run ```make```
@@ -31,9 +30,9 @@ The boilerplate project from ```eosio-init``` does not include a ```.gitignore``
 The ABI and WASM files are created in the ```configex``` directory.
 
 
-### Major Components
+## Major Components
 
-#### Configuration Singleton
+### Configuration Singleton
 
 A singleton is a table with one row.  The configuration singleton contains contract-wide configuration parameters.
 
@@ -75,7 +74,7 @@ void configex::setconfig  ( const name& deposit_token_contract, const symbol& de
 }
 ```
 
-#### Accessing Configuration
+### Accessing Configuration
 From within an action, the configuration singleton can be accessed via:
 ```
 config_table      config_s (get_self(), get_self().value);
@@ -96,7 +95,7 @@ void configex::setsetting ( const name& setting_name, const uint8_t& setting_val
 }
 ```
 
-#### Requiring Auth of Number Selector to Set Winning Numbers
+### Requiring Auth of Number Selector to Set Winning Numbers
 Only the ```number_selector``` from the configuration is allowed to set winning numbers.
 ```
 void configex::setwinnums () {
@@ -111,7 +110,7 @@ void configex::setwinnums () {
 }
 ```
 
-### Testing
+## Testing
 I use ```eoslime``` and ```mocha``` for testing.
 
 EOSLime repo: https://github.com/limechain/eoslime
