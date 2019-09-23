@@ -1,7 +1,17 @@
 
 ## configex Project
-### Purpose
-Illustrate how to setup and manage a contract configuration singleton
+### Learning Objectives
+- Illustrate how to setup and manage a contract configuration singleton with a settings map.
+- Illustrate build process using ```cmake```
+- Illustrate how to test with ```eoslime```
+
+#### Learning Activities
+- Clone the repo and investigate files to see how it works
+- Build the project using ```cmake```
+- Test the contract using ```nodeos```, ```eoslime```, and ```mocha```
+- Try out creating a new configuration item in the singleton, such as ```float  test_config_float```
+- Try out creating a new setting in the settings map using ```setsetting```
+- Write tests for your new features
 
 #### Creation / Init
 This project was created using:
