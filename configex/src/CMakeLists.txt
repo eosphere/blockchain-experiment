@@ -5,4 +5,3 @@ find_package(eosio.cdt)
 
 add_contract( configex configex configex.cpp )
 target_include_directories( configex PUBLIC ${CMAKE_SOURCE_DIR}/../include )
-target_ricardian_directory( configex ${CMAKE_SOURCE_DIR}/../ricardian )
