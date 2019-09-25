@@ -12,5 +12,5 @@ depositmgr_project-prefix
 **/.nyc_output/**
 node_modules
 package-lock.json
-depositmgr/
+./depositmgr/
 *.json

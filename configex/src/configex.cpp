@@ -33,11 +33,14 @@ void configex::activate () {
    setsetting ("active"_n, 1);
 }
 
-void configex::createticket () {
+void configex::createticket (const name& buyer) {
+
+   // require_auth (buyer);
+   // check (has_auth (buyer) || has_auth(terminal), "Permission denied");
 
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
-   
+
    // illustrates how settings are used
    // do not allow ticket creation when contract is paused
    // NOTE:: default value for a settings that does not exist in 0 (ZERO)
