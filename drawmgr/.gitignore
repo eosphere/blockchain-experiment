@@ -6,6 +6,7 @@ ricardian
 **/Makefile
 **/CMakeCache.txt
 drawmgr_project-prefix/*
+drawmgr_project-prefix
 **/*.abi
 **/*.wasm
 **/.nyc*
