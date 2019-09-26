@@ -2,12 +2,13 @@
 const assert = require('assert');
 const eoslime = require('eoslime').init('local');
 
-const DRAWMGR_WASM_PATH = '../drawmgr/drawmgr/drawmgr.wasm';
-const DRAWMGR_ABI_PATH = '../drawmgr/drawmgr/drawmgr.abi';
+const DRAWMGR_WASM_PATH = '../drawmgr/drawmgr.wasm';
+const DRAWMGR_ABI_PATH = '../drawmgr/drawmgr.abi';
 
-async function printTickets ( ) {
+async function printTickets (contract) {
     console.log("Printing all tickets.");
     let ticketTable = await contract.provider.eos.getTableRows({
+        code: contract.name,
         table: 'tickets',
         json: true
     });
@@ -21,12 +22,9 @@ describe('Drawmgr Testing', function () {
     // Increase mocha(testing framework) time, otherwise tests fails
     this.timeout(150000);
 
-    let drawmgrContract, tokenContract;
-    let drawmgrAccount, tokenAccount;
-    let ticketBuyer1, ticketBuyer2, ticketBuyer3, ticketBuyer4, ticketBuyer5;
-    let numberSelector;
+    let drawmgrContract;
+    let drawmgrAccount;
     let accounts;
-    let config;
 
     before(async () => {
 
@@ -43,7 +41,12 @@ describe('Drawmgr Testing', function () {
 
         console.log ("\n\n");
             
-        await printTickets();
+        
+    });
+
+    it('print', async () => {
+
+        await printTickets(drawmgrContract);
     });
 
    
