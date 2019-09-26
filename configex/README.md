@@ -4,6 +4,14 @@
 - Illustrate build process using ```cmake```
 - Illustrate how to test with ```eoslime```
 
+## Install
+
+MAC users
+ - brew install cmake
+ - npm install eoslime
+ - npm install -g mocha
+
+
 ## Learning Activities
 - Clone the repo and investigate files to see how it works
 - Build the project using ```cmake```
