@@ -188,3 +188,21 @@ void experiment::withdraw (const name& account, const asset& quantity) {
       std::make_tuple(get_self(), account, quantity, memo))
    .send();
 }
+
+void experiment::cancelticket(const uint64_t& serial_no){
+
+   //check ticket status, must by purchased
+   //update ticket status to cancelled
+   //refund
+}
+
+void experiment::updatewins(const set<uint64_t> serial_no){
+   //update ticket table, only can be perfomed by numberSelector account
+}
+
+void experiment::claim(const uint64_t& serial_no){
+   //validate the winning number
+   //retrieve dividents from winning_dividens table (pending for create)
+   //transfer winning amount
+   //update ticket status to claimed
+}

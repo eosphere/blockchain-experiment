@@ -10,6 +10,14 @@ using std::set;
 using namespace eosio;
 
 CONTRACT experiment : public contract {
+
+   private:
+      enum ticket_status: int8_t {
+         PURCHASED = 0,
+         CANCELLED = 1,
+         CLAIMED = 2
+      };
+
    public:
       using contract::contract;
 
@@ -49,7 +57,8 @@ CONTRACT experiment : public contract {
          set<uint8_t>            entrynumbers               ;
          uint64_t                drawnumber                 ;
          uint8_t                 winningtier                ;
-         bool                    claimed                    = false;
+         //bool                    claimed                    = false;
+         int8_t                  ticket_status              = PURCHASED;
          asset                   price                      ;
          uint64_t                storeid                    ;
          time_point              created_date               = current_block_time().to_time_point();
@@ -68,6 +77,7 @@ CONTRACT experiment : public contract {
          uint64_t                drawnumber                 ;
          set<uint8_t>            winningnumbers             ;
          bool                    open                       = true;
+         time_point              created_date               = current_block_time().to_time_point();
          uint64_t primary_key() const { return drawnumber; }
       };
       typedef multi_index<"draws"_n, draw> draw_table;
@@ -86,6 +96,16 @@ CONTRACT experiment : public contract {
       [[eosio::on_notify("*::transfer")]]
       void deposit ( const name& from, const name& to, const asset& quantity, const string& memo );
 
-      ACTION withdraw (const name& account, const asset& quantity);
+      ACTION withdraw ( const name& account, const asset& quantity );
+
+      //update ticket status from ticket table, refund
+      ACTION cancelticket( const uint64_t& serial_no );
+
+      //update ticket by winning number
+      ACTION updatewins( const set<uint64_t> serial_no );
+      
+      //update ticket status and pay
+      ACTION claim( const uint64_t& serial_no );
+
 
 };
