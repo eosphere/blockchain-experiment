@@ -82,6 +82,15 @@ CONTRACT experiment : public contract {
       };
       typedef multi_index<"draws"_n, draw> draw_table;
 
+      // table to maintain dividend
+      struct [[ eosio::table, eosio::contract("experiment") ]] dividend
+      {
+         uint64_t                      drawnumber           ;
+         // winningtier and dividend map
+         std::map<uint8_t, double>     settings             ;
+      };
+      typedef multi_index<"dividends"_n, dividend> dividend_table;
+
       // action signatures (these inform the contract ABI which actions can be invoked)
       ACTION setconfig ( const name& deposit_token_contract, const symbol& deposit_symbol, const name& number_selector );
       ACTION setsetting ( const name& setting_name, const uint8_t& setting_value );
