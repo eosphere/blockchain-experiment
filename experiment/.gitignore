@@ -5,12 +5,12 @@ build
 ricardian
 **/Makefile
 **/CMakeCache.txt
-depositmgr_project-prefix
+experiment_project-prefix
 **/*.abi
 **/*.wasm
 **/.nyc*
 **/.nyc_output/**
 node_modules
 package-lock.json
-./depositmgr/
+./experiment/
 *.json
