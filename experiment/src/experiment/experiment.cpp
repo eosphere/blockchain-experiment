@@ -46,6 +46,23 @@ void experiment::createdraw () {
    });
 }
 
+void experiment::closedraw (const uint64_t& drawnumber) {
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+   
+   require_auth (c.number_selector);
+
+   draw_table d_t (get_self(), get_self().value);
+   auto d_itr = d_t.find(drawnumber);
+   check (d_itr != d_t.end(), "Draw " + std::to_string(drawnumber) + " not found.");
+   check (d_itr->open, "Draw already closed.");
+
+   d_t.modify(d_itr, get_self(), [&](auto& d){
+      d.open = false;
+      d.last_modified_date = current_block_time().to_time_point();
+   });
+}
+
 void experiment::createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers) {
 
    config_table      config_s (get_self(), get_self().value);
@@ -192,4 +209,79 @@ void experiment::withdraw (const name& account, const asset& quantity) {
       b_itr->token_contract, "transfer"_n,
       std::make_tuple(get_self(), account, quantity, memo))
    .send();
+}
+
+void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+   
+   // ensure not paused
+   uint8_t paused = c.settings[name("active")];
+   check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
+
+   //check ticket
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == PURCHASED, "Ticket cannot be cancelled.");
+
+   //check purchaser if storeid is empty
+   check (t_itr->purchaser.value == purchaser.value, "Ticket can only be cancelled by purchaser.");
+
+   // ensure draw exists
+   uint64_t draw_number = t_itr->drawnumber;
+   draw_table d_t (get_self(), get_self().value);
+   auto d_itr = d_t.find(draw_number);
+   check (d_itr != d_t.end(), "Draw number " + std::to_string(draw_number) + " not found.");
+   check (d_itr->open, "Draw already closed, cannot cancel the ticket.");
+
+   //update ticket
+   print ("\n");
+   print ("cancelling ticket-->" + std::to_string(serial_no));
+   print ("ticket status-->" + std::to_string(t_itr->ticket_status));
+   t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.ticket_status = CANCELLED;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
+   print ("cancelled ticket-->" + std::to_string(serial_no));
+   print ("ticket status-->" + std::to_string(t_itr->ticket_status));
+   print ("\n");
+
+   // refund
+   asset ticket_cost = t_itr->price;
+   balance_table balances(get_self(), purchaser.value);
+   auto b_itr = balances.find(ticket_cost.symbol.code().raw());
+   check (b_itr != balances.end(), "Currenty " + ticket_cost.symbol.code().to_string() + " not found in balance");
+   balances.modify(b_itr, get_self(), [&](auto& bal){
+      bal.funds += ticket_cost;
+   });
+
+   // if (b_itr != balances.end()) {
+     
+   // });
+   // } else {
+   //    balances.emplace(b_itr, get_self(), [&](auto& bal){
+   //       bal.funds = ticket_cost;
+   //       // need set the token_contract?
+   //       //bal.token_contract = 
+   //    });
+   // }
+
+}
+
+// void experiment::updatewintkt(const set<serinal_tier> serinalno_tier){
+//    //update ticket table, only can be perfomed by numberSelector account
+// }
+
+void experiment::claim(const uint64_t& serial_no){
+   //validate the winning number
+   //retrieve dividents from winning_dividens table
+   //transfer winning amount
+   //update ticket status to claimed
+}
+
+void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends){
+   // account is number selector
+   // draw is closed
 }

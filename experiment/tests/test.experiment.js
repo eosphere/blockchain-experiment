@@ -192,6 +192,15 @@ describe('experiment Testing', function () {
         assert.equal (drawTable.rows.length, 1);
     });
 
+    it ("Can close draw", async () => {
+        
+    });
+
+    it ("Draw already closed.", async () => {
+
+    });
+
+
     it('Tickets should not be purchasable if contract is paused', async () => {
       
         // first, since default value of setting is to have contract paused, this should generate an assert
@@ -247,6 +256,36 @@ describe('experiment Testing', function () {
         experimentContract.setwinnums(0, await getNumbers(), { from: numberSelector });
     });
 
-    
+
+    it ("Ticket cannot be cancelled if canncelld or claimed", async () => {
+
+    });
+
+    it ("Ticket cannot be cancelled if draw closed", async () => {
+
+    });
+
+    it ("Ticket can only be cancelled by purchaser", async() => {
+
+        const purchased_ticket = await printTickets(experimentContract);
+        await eoslime.utils.test.expectAssert(
+            experimentContract.cancelticket(ticketBuyer2.name, purchased_ticket[0].serialno)
+        );
+    });
+
+    it ("Ticket cancelled successfully", async() => {
+        await experimentContract.activate();
+        //await experimentContract.createticket(ticketBuyer1.name, 0, await getNumbers(), { from: ticketBuyer1});
+
+        const purchased_ticket = await printTickets(experimentContract);
+        let serialno = purchased_ticket[purchased_ticket.length - 1].serialno;
+        console.log("\n");
+        console.log("Canelling ticket: " + JSON.stringify(purchased_ticket[purchased_ticket.length - 1]));
+        experimentContract.cancelticket(ticketBuyer1.name, serialno);
+        // let's print the tickets
+        const cancelled_ticket = await printTickets(experimentContract);
+        console.log("cancelled ticket: " + JSON.stringify(cancelled_ticket[purchased_ticket.length - 1]));
+        //assert.equal (cancelled_ticket[0].ticket_status, 1);
+    });
 });
 
