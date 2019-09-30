@@ -1,0 +1,12 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "eosjs": "^20.0.0",
+    "node-fetch": "^2.6.0",
+    "util": "^0.12.1"
+  }
+}
