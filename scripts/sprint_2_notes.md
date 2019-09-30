@@ -130,7 +130,7 @@ In order for ticket results to be on-chain provable/auditable, we must validate 
 The contract node must compare the winning numbers to the ticket numbers and calculate a winning amount.
 
 
-###  Sprint 2, Primary Task: Off-chain Process Winning Tickets
+##  Sprint 2, Primary Task: Off-chain Process Winning Tickets
 
 This task must read the ```draws``` table to get the winning numbers and the ```tickets``` table. It must iterate the list of tickets, determine if the ticket one, and if so, call the ```processticket``` action.  This job could call ```processticket``` for each ticket in the table, but it will be much faster to check the ticket off-chain and only call ```processticket``` for winning tickets.
 
