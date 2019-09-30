@@ -18,6 +18,11 @@ CONTRACT experiment : public contract {
          CLAIMED = 2
       };
 
+      class serinal_tier {
+         uint64_t                serialno                   ;
+         uint8_t                 winningtier                ;
+      };
+
    public:
       using contract::contract;
 
@@ -87,7 +92,7 @@ CONTRACT experiment : public contract {
       {
          uint64_t                      drawnumber           ;
          // winningtier and dividend map
-         std::map<uint8_t, double>     settings             ;
+         std::map<uint8_t, double>     dividneds             ;
       };
       typedef multi_index<"dividends"_n, dividend> dividend_table;
 
@@ -111,10 +116,10 @@ CONTRACT experiment : public contract {
       ACTION cancelticket( const uint64_t& serial_no );
 
       //update ticket by winning number
-      ACTION updatewins( const set<uint64_t> serial_no );
+      ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
       //update ticket status and pay
       ACTION claim( const uint64_t& serial_no );
 
-
+      ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends);
 };

@@ -196,13 +196,18 @@ void experiment::cancelticket(const uint64_t& serial_no){
    //refund
 }
 
-void experiment::updatewins(const set<uint64_t> serial_no){
+void experiment::updatewintkt(const set<serinal_tier> serinalno_tier){
    //update ticket table, only can be perfomed by numberSelector account
 }
 
 void experiment::claim(const uint64_t& serial_no){
    //validate the winning number
-   //retrieve dividents from winning_dividens table (pending for create)
+   //retrieve dividents from winning_dividens table
    //transfer winning amount
    //update ticket status to claimed
+}
+
+void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends){
+   // account is number selector
+   // draw is closed
 }
