@@ -18,13 +18,13 @@ CONTRACT experiment : public contract {
          CLAIMED = 2
       };
 
+   public:
+      using contract::contract;
+
       class serinal_tier {
          uint64_t                serialno                   ;
          uint8_t                 winningtier                ;
       };
-
-   public:
-      using contract::contract;
 
       struct [[ eosio::table, eosio::contract("experiment") ]] config
       {
@@ -67,6 +67,7 @@ CONTRACT experiment : public contract {
          asset                   price                      ;
          uint64_t                storeid                    ;
          time_point              created_date               = current_block_time().to_time_point();
+         time_point              last_modified_date         = current_block_time().to_time_point();
          uint64_t primary_key() const { return serialno; }
          uint64_t by_purchaser() const { return purchaser.value; }
       };
@@ -83,11 +84,12 @@ CONTRACT experiment : public contract {
          set<uint8_t>            winningnumbers             ;
          bool                    open                       = true;
          time_point              created_date               = current_block_time().to_time_point();
+         time_point              last_modified_date         = current_block_time().to_time_point();
          uint64_t primary_key() const { return drawnumber; }
       };
       typedef multi_index<"draws"_n, draw> draw_table;
 
-      // table to maintain dividend
+      // table to maintain dividendCANCELLED
       struct [[ eosio::table, eosio::contract("experiment") ]] dividend
       {
          uint64_t                      drawnumber           ;
@@ -103,6 +105,7 @@ CONTRACT experiment : public contract {
       ACTION activate ();
       
       ACTION createdraw ();
+      ACTION closedraw ( const uint64_t& drawnumber );
       ACTION createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers);
       ACTION setwinnums (const uint64_t& drawnumber, const set<uint8_t> winningnumbers);
 
@@ -113,10 +116,10 @@ CONTRACT experiment : public contract {
       ACTION withdraw ( const name& account, const asset& quantity );
 
       //update ticket status from ticket table, refund
-      ACTION cancelticket( const uint64_t& serial_no );
+      ACTION cancelticket( const name& purchaser, const uint64_t& serial_no );
 
       //update ticket by winning number
-      ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
+      //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
       //update ticket status and pay
       ACTION claim( const uint64_t& serial_no );
