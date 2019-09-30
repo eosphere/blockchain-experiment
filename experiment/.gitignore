@@ -14,3 +14,4 @@ node_modules
 package-lock.json
 ./depositmgr/
 *.json
+experiment_project-prefix

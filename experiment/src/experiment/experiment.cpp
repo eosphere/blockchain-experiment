@@ -67,7 +67,9 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
-   check (d_itr->open == false, "Draw number is closed: " + std::to_string(drawnumber));
+   
+   // NOTE: commented this out for now -- we will need an action to OPEN draw
+   // check (d_itr->open == false, "Draw number is closed: " + std::to_string(drawnumber));
 
    asset ticket_cost = asset { 100, c.deposit_symbol };  // ticket cost of 1 AUD
 
@@ -121,6 +123,8 @@ void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winn
 }
 
 void experiment::deposit ( const name& from, const name& to, const asset& quantity, const string& memo ) {
+
+   if (to != get_self()) { return; }
 
    // this is the contract housing the token contract
    name token_contract = get_first_receiver();
