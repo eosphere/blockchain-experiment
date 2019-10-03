@@ -290,7 +290,7 @@ void experiment::processwin(const uint64_t& serial_no){
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find(t_itr->drawnumber);
-   check (!d_itr->open, "No Winns Yet!!!");
+   check (d_itr->open, "No Winns Yet!!!");
    check (d_itr->winningnumbers.size() == 0, "No Winns Yet!!!");
    
    std::set<uint8_t> diff;
@@ -304,7 +304,7 @@ void experiment::processwin(const uint64_t& serial_no){
       row.last_modified_date = current_block_time().to_time_point();
    });
 
-   print ("cancelled ticket-->" + std::to_string(serial_no));
+   print ("Scanned winning ticket-->" + std::to_string(serial_no));
   
 }
 
