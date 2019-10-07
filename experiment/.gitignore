@@ -14,3 +14,5 @@ node_modules
 package-lock.json
 ./experiment/
 *.json
+experiment_project-prefix
+**node_modules/

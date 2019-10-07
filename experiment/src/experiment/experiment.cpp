@@ -55,7 +55,7 @@ void experiment::closedraw (const uint64_t& drawnumber) {
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find(drawnumber);
    check (d_itr != d_t.end(), "Draw " + std::to_string(drawnumber) + " not found.");
-   check (d_itr->open, "Draw already closed.");
+   check (!d_itr->open, "Draw already closed.");
 
    d_t.modify(d_itr, get_self(), [&](auto& d){
       d.open = false;
@@ -84,6 +84,9 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
+   
+   // NOTE: commented this out for now -- we will need an action to OPEN draw
+   // check (d_itr->open == false, "Draw number is closed: " + std::to_string(drawnumber));
 
    asset ticket_cost = asset { 100, c.deposit_symbol };  // ticket cost of 1 AUD
 
@@ -137,6 +140,8 @@ void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winn
 }
 
 void experiment::deposit ( const name& from, const name& to, const asset& quantity, const string& memo ) {
+
+   if (to != get_self()) { return; }
 
    // this is the contract housing the token contract
    name token_contract = get_first_receiver();
@@ -268,6 +273,40 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
 // void experiment::updatewintkt(const set<serinal_tier> serinalno_tier){
 //    //update ticket table, only can be perfomed by numberSelector account
 // }
+
+void experiment::processwin(const uint64_t& serial_no){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+   
+   // ensure not paused
+   uint8_t paused = c.settings[name("active")];
+   check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
+
+   //check ticket
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   
+   //get draw based on ticket drawno check draw open,check winnings set
+   draw_table d_t (get_self(), get_self().value);
+   auto d_itr = d_t.find(t_itr->drawnumber);
+   check (d_itr->open, "No Winns Yet!!!");
+   check (d_itr->winningnumbers.size() == 0, "No Winns Yet!!!");
+   
+   std::set<uint8_t> diff;
+
+   std::set_difference(d_itr->winningnumbers.begin(),d_itr->winningnumbers.end(),t_itr->entrynumbers.begin(),t_itr->entrynumbers.end(),std::inserter(diff,diff.begin()));
+     
+    check (diff.size() > 3, "No Winns. Better luck next time");
+  
+   t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.winningtier = diff.size()+1;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
+   print ("Scanned winning ticket-->" + std::to_string(serial_no));
+  
+}
 
 void experiment::claim(const uint64_t& serial_no){
    //validate the winning number

@@ -117,7 +117,9 @@ CONTRACT experiment : public contract {
 
       //update ticket status from ticket table, refund
       ACTION cancelticket( const name& purchaser, const uint64_t& serial_no );
-
+      
+      ACTION processwin(const uint64_t& serial_no );
+      
       //update ticket by winning number
       //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
