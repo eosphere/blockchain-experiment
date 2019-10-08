@@ -290,14 +290,14 @@ void experiment::processwin(const uint64_t& serial_no){
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find(t_itr->drawnumber);
-   check (d_itr->open, "No Winns Yet!!!");
-   check (d_itr->winningnumbers.size() == 0, "No Winns Yet!!!");
+   check (!d_itr->open, "No Winns Yet!!!");
+   check (d_itr->winningnumbers.size() == 6, "No Winns Yet!!!");
    
    std::set<uint8_t> diff;
 
    std::set_difference(d_itr->winningnumbers.begin(),d_itr->winningnumbers.end(),t_itr->entrynumbers.begin(),t_itr->entrynumbers.end(),std::inserter(diff,diff.begin()));
      
-    check (diff.size() > 3, "No Winns. Better luck next time");
+    check (diff.size() <= 3, "No Winns. Better luck next time");
   
    t_t.modify(t_itr, get_self(), [&](auto& row){
       row.winningtier = diff.size()+1;
