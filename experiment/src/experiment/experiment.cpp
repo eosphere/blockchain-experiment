@@ -55,7 +55,7 @@ void experiment::closedraw (const uint64_t& drawnumber) {
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find(drawnumber);
    check (d_itr != d_t.end(), "Draw " + std::to_string(drawnumber) + " not found.");
-   check (!d_itr->open, "Draw already closed.");
+   check (d_itr->open, "Draw already closed.");
 
    d_t.modify(d_itr, get_self(), [&](auto& d){
       d.open = false;
