@@ -210,7 +210,6 @@ describe('experiment Testing', function () {
     });
 
     it('Tickets should be purchasable', async () => {
-
         // then let's activate it (sets active setting to 1) and test creating a ticket
         await experimentContract.activate();
         await experimentContract.createticket(ticketBuyer1.name, 0, await getNumbers(), { from: ticketBuyer1});
@@ -269,18 +268,14 @@ describe('experiment Testing', function () {
         const purchased_ticket = await printTickets(experimentContract);
         const ticket_index = purchased_ticket.length - 1;
         const serialno = purchased_ticket[ticket_index].serialno;
-        const balance = await printTokenBalance(tokenAccount, ticketBuyer1);
-        const before_cancel = balance.balance;
-        console.log("before cancellation of ticket:" + JSON.stringify(balance));
-        
+
         await experimentContract.cancelticket(ticketBuyer1.name, serialno);
 
         const cancelled_ticket = await printTickets(experimentContract);
-        const cancelled_balance = await printTokenBalance(tokenAccount, ticketBuyer1);
+        const cancelled_balance = await printContractBalance(experimentAccount, ticketBuyer1);
 
-        console.log("after cancelled of ticket:" + JSON.stringify(cancelled_balance));
         assert.equal (cancelled_ticket[ticket_index].ticket_status, 1);
-        assert.equal (cancelled_balance.balance, "1.00 AUD");
+        assert.equal (cancelled_balance.funds, "9899.50 AUD");
     });
 
     it ("Ticket cannot be cancelled if canncelld or claimed", async () => {
