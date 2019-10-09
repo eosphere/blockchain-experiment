@@ -223,7 +223,7 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
    ticket_table t_t (get_self(), get_self().value);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
-   check (t_itr->ticket_status == PURCHASED, "Ticket cannot be cancelled if canncelld or claimed.");
+   check (t_itr->ticket_status == PURCHASED, "Ticket cannot be cancelled if cancelled or claimed.");
 
    //check purchaser if storeid is empty
    check (t_itr->purchaser.value == purchaser.value, "Ticket can only be cancelled by purchaser.");
