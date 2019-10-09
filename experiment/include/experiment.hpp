@@ -69,12 +69,17 @@ CONTRACT experiment : public contract {
          time_point              created_date               = current_block_time().to_time_point();
          time_point              last_modified_date         = current_block_time().to_time_point();
          uint64_t primary_key() const { return serialno; }
+         uint64_t by_draw() const { return drawnumber; }
+         uint64_t by_wintier() const { return winningtier; }
+         uint64_t by_status() const { return ticket_status; }
          uint64_t by_purchaser() const { return purchaser.value; }
       };
 
       typedef multi_index<"tickets"_n, ticket,
-         indexed_by<"byuser"_n, 
-            const_mem_fun<ticket, uint64_t, &ticket::by_purchaser>>
+         indexed_by<"byuser"_n, const_mem_fun<ticket, uint64_t, &ticket::by_purchaser>>,
+         indexed_by<"bydraw"_n, const_mem_fun<ticket, uint64_t, &ticket::by_draw>>,
+         indexed_by<"bystatus"_n, const_mem_fun<ticket, uint64_t, &ticket::by_status>>,
+         indexed_by<"bywintier"_n, const_mem_fun<ticket, uint64_t, &ticket::by_wintier>>
       > ticket_table;
 
       // table to maintain draw data
