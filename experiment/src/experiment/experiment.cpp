@@ -286,6 +286,7 @@ void experiment::processwin(const uint64_t& serial_no){
    ticket_table t_t (get_self(), get_self().value);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Clamied ");
    
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
