@@ -3,7 +3,9 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Box from '@material-ui/core/Box';
 import Deposits from '../components/Dashboard/Deposits';
 import Orders from '../components/Dashboard/Orders';
 import Title from '../components/Dashboard/Title';
@@ -17,21 +19,60 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   fixedHeight: {
-    height: 240
+    height: 150
+  },
+  title: {
+    textTransform: 'capitalize'
   }
 }));
 
-const Welcome = () => {
+const Welcome = ({ wallet }) => {
+  const classes = useStyles();
+  const { accountInfo } = wallet;
   return (
     <>
-      <Title>Buy a Ticket</Title>
-      <div>
-        <Link color="primary" href="#">
-          Buy a Ticket
-        </Link>
-      </div>
+      <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
     </>
   );
+};
+const BuyTicket = ({ wallet }) => {
+  // const classes = useStyles();
+  // const { accountInfo } = wallet;
+  return (
+    <>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        onClick={() => alert('Coming Soon.')}>
+        Buy a Ticket
+      </Button>
+      <br />
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        onClick={() => alert('Coming Soon.')}>
+        Transfer Funds
+      </Button>
+    </>
+  );
+};
+
+const Wrapper = ({ wallet, children }) => {
+  const { accountInfo } = wallet;
+  if (!accountInfo)
+    return (
+      <Box
+        flexGrow="1"
+        display="flex"
+        alignItems="center"
+        flexDirection="column"
+        justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  return <>{children}</>;
 };
 
 const DashboardContainer = () => {
@@ -42,12 +83,23 @@ const DashboardContainer = () => {
     <Grid container spacing={3}>
       <Grid item xs={12} md={4} lg={4}>
         <Paper className={fixedHeightPaper}>
-          <Welcome wallet={wallet} />
+          <Wrapper wallet={wallet}>
+            <Welcome wallet={wallet} />
+          </Wrapper>
         </Paper>
       </Grid>
       <Grid item xs={12} md={4} lg={4}>
         <Paper className={fixedHeightPaper}>
-          <Deposits wallet={wallet} />
+          <Wrapper wallet={wallet}>
+            <Deposits wallet={wallet} />
+          </Wrapper>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={4} lg={4}>
+        <Paper className={fixedHeightPaper}>
+          <Wrapper wallet={wallet}>
+            <BuyTicket wallet={wallet} />
+          </Wrapper>
         </Paper>
       </Grid>
       <Grid item xs={12}>
