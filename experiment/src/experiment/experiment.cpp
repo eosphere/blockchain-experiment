@@ -320,3 +320,16 @@ void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, 
    // account is number selector
    // draw is closed
 }
+
+//Erase all the table data expect for balance table
+void experiment::reset(int limit){
+
+    ticket_table t_t (get_self(), get_self().value);
+    auto tt_itr = t_t.begin ();
+
+    for(int i =0; i<= limit;i++){
+      if(tt_itr ==  t_t.end ())
+      break;
+      tt_itr = t_t.erase(tt_itr);
+    }
+}
