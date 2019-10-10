@@ -316,7 +316,32 @@ void experiment::claim(const uint64_t& serial_no){
    //update ticket status to claimed
 }
 
-void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends){
-   // account is number selector
-   // draw is closed
+void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   // ONLY the number_selector can set the winning numbers
+   require_auth (c.number_selector);
+
+   //check draw, must be closed
+   draw_table r_t (get_self(), get_self().value);
+   auto r_itr = r_t.find(drawnumber);
+   check (!r_itr->open, "Draw is not closed yet!!");
+
+   // set the numbers in the draw table record
+   dividend_table d_t (get_self(), get_self().value);
+   auto d_itr = d_t.find (drawnumber);
+   if (d_itr == d_t.end()) {
+      //create
+      d_t.emplace(get_self(), [&](auto& row){
+         row.drawnumber = drawnumber;
+         row.dividneds = dividends;
+      });
+   } else {
+      //update
+      d_t.modify(d_itr, get_self(), [&](auto& row){
+         row.dividneds = dividends;
+      });
+   }
+   
 }
