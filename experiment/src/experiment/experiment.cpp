@@ -333,3 +333,18 @@ void experiment::reset(int limit){
       tt_itr = t_t.erase(tt_itr);
     }
 }
+
+//update the winning tier for specific ticket number (serial no)
+void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   
+    t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.winningtier = win_tier;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
+}
