@@ -130,6 +130,9 @@ CONTRACT experiment : public contract {
       
       //update ticket status and pay
       ACTION claim( const uint64_t& serial_no );
-
+      
+      //Erase all the table data expect for balance table
+      ACTION reset(int limit);
+      
       ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends);
 };
