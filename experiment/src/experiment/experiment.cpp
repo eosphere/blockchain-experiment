@@ -286,7 +286,7 @@ void experiment::processwin(const uint64_t& serial_no){
    ticket_table t_t (get_self(), get_self().value);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
-   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Clamied ");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
    
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
@@ -332,4 +332,21 @@ void experiment::reset(int limit){
       break;
       tt_itr = t_t.erase(tt_itr);
     }
+}
+
+//update the winning tier for specific ticket number (serial no)
+void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
+    t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.winningtier = win_tier;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
 }

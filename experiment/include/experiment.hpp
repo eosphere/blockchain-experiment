@@ -135,4 +135,7 @@ CONTRACT experiment : public contract {
 
       //Erase all the table data expect for balance table
       ACTION reset(int limit);
+
+      //Update winningtier
+      ACTION updatewint(const uint64_t& serial_no,uint8_t win_tier);
 };
