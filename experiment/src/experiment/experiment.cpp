@@ -286,7 +286,7 @@ void experiment::processwin(const uint64_t& serial_no){
    ticket_table t_t (get_self(), get_self().value);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
-   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Clamied ");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
    
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
@@ -309,11 +309,52 @@ void experiment::processwin(const uint64_t& serial_no){
   
 }
 
-void experiment::claim(const uint64_t& serial_no){
+void experiment::claim( const uint64_t& serial_no ){
+
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   // ensure not paused
+   uint8_t paused = c.settings[name("active")];
+   check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
+
+   //check ticket
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == PURCHASED, "Ticket cannot be claimed");
+   
    //validate the winning number
+   if (t_itr->winningtier == 0) {
+      processwin (serial_no);
+   }
+   ticket_table tt_t (get_self(), get_self().value);
+   t_itr = tt_t.find (serial_no);
+   check (t_itr->winningtier>0, "Sorry, your are not win.");
+
    //retrieve dividents from winning_dividens table
+   dividend_table d_t (get_self(), get_self().value);
+   //TODO: To simplfy the dividends handling, use fixed dividends at this moment
+   //auto d_itr = d_t.find(t_itr->drawnumber);
+   auto d_itr = d_t.find(0); 
+   check (d_itr != d_t.end(), "Ooops, no winning dividends for this draw");
+   auto divmap = d_itr->dividends;
+   asset prize = divmap.at(t_itr->winningtier);
+   check (prize.amount > 0, "Ooops, no price for tier" + std::to_string(t_itr->winningtier));
+
    //transfer winning amount
+   string memo { "Pay dividends for ticket: " + std::to_string(serial_no) };
+   action(
+      permission_level{get_self(), "active"_n},
+      c.deposit_token_contract, "transfer"_n,
+      std::make_tuple(c.deposit_token_contract, t_itr->purchaser, prize, memo))
+   .send();
+
    //update ticket status to claimed
+   tt_t.modify(t_itr, get_self(), [&](auto& row){
+      row.ticket_status = CLAIMED;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
 }
 
 void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends){
@@ -335,13 +376,54 @@ void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, 
       //create
       d_t.emplace(get_self(), [&](auto& row){
          row.drawnumber = drawnumber;
-         row.dividneds = dividends;
+         row.dividends = dividends;
       });
    } else {
       //update
       d_t.modify(d_itr, get_self(), [&](auto& row){
-         row.dividneds = dividends;
+         row.dividends = dividends;
       });
    }
    
+}
+
+
+//Erase all the table data expect for balance table
+void experiment::reset(int limit){
+    require_auth (get_self());
+
+    ticket_table t_t (get_self(), get_self().value);
+    auto tt_itr = t_t.begin ();
+
+    for(int i =0; i<= limit;i++){
+      if(tt_itr ==  t_t.end ())
+      break;
+      tt_itr = t_t.erase(tt_itr);
+    }
+
+    dividend_table d_t (get_self(), get_self().value);
+    auto d_itr = d_t.begin ();
+
+    for (int i = 0; i<=limit; i++) {
+      if (d_itr == d_t.end())
+         break;
+      d_itr = d_t.erase(d_itr); 
+    }
+}
+
+//update the winning tier for specific ticket number (serial no)
+void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   ticket_table t_t (get_self(), get_self().value);
+   auto t_itr = t_t.find (serial_no);
+   
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
+    t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.winningtier = win_tier;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
 }

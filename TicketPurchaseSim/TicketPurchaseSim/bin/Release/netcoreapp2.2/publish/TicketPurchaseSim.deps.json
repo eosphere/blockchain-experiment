@@ -1,0 +1,84 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.2",
+    "signature": "1b181cdeba63005c2ca38e738301a2122e8d588f"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.2": {
+      "TicketPurchaseSim/1.0.0": {
+        "dependencies": {
+          "EosSharp.Core": "1.0.0",
+          "eos-sharp": "2.1.0"
+        },
+        "runtime": {
+          "TicketPurchaseSim.dll": {}
+        }
+      },
+      "Cryptography.ECDSA.Secp256K1/1.1.2": {
+        "runtime": {
+          "lib/netstandard2.0/Cryptography.ECDSA.dll": {
+            "assemblyVersion": "1.1.2.0",
+            "fileVersion": "1.1.2.0"
+          }
+        }
+      },
+      "Newtonsoft.Json/12.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.1.22727"
+          }
+        }
+      },
+      "eos-sharp/2.1.0": {
+        "dependencies": {
+          "Cryptography.ECDSA.Secp256K1": "1.1.2",
+          "Newtonsoft.Json": "12.0.1"
+        },
+        "runtime": {
+          "EosSharp.dll": {}
+        }
+      },
+      "EosSharp.Core/1.0.0": {
+        "dependencies": {
+          "Cryptography.ECDSA.Secp256K1": "1.1.2"
+        },
+        "runtime": {
+          "EosSharp.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TicketPurchaseSim/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Cryptography.ECDSA.Secp256K1/1.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-y/RzJEiUBZ+IKzqacAozE7WW7pQ+btc3M+/f1fL8Mw37fsTntNHORoLBLqsC0FO5jWQ2b4yfY9gl/nysZasevg==",
+      "path": "cryptography.ecdsa.secp256k1/1.1.2",
+      "hashPath": "cryptography.ecdsa.secp256k1.1.1.2.nupkg.sha512"
+    },
+    "Newtonsoft.Json/12.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pBR3wCgYWZGiaZDYP+HHYnalVnPJlpP1q55qvVb+adrDHmFMDc1NAKio61xTwftK3Pw5h7TZJPJEEVMd6ty8rg==",
+      "path": "newtonsoft.json/12.0.1",
+      "hashPath": "newtonsoft.json.12.0.1.nupkg.sha512"
+    },
+    "eos-sharp/2.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EosSharp.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
