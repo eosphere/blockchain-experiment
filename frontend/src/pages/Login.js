@@ -123,7 +123,7 @@ class Login extends React.PureComponent {
               <CircularProgress />
             ) : (
               <>
-                <h1>Welcome to the Blockchain Experiment.</h1>
+                <h1 style={{ textAlign: 'center' }}>Welcome to the Blockchain Experiment.</h1>
                 <Button
                   variant="contained"
                   size="large"

@@ -4,3 +4,5 @@ export function toNumber(input?: string) {
   if (!chunks[0]) return 0;
   return Number(chunks[0]);
 }
+
+export const TOKEN_SMARTCONTRACT = process.env.REACT_APP_TOKEN_SMARTCONTRACT;

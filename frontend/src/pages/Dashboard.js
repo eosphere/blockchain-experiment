@@ -6,7 +6,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
-import Deposits from '../components/Dashboard/Deposits';
+import Balance from '../components/Dashboard/Balance';
 import Orders from '../components/Dashboard/Orders';
 import Title from '../components/Dashboard/Title';
 import WAL from 'eos-transit';
@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   fixedHeight: {
-    height: 150
+    height: 200
   },
   title: {
     textTransform: 'capitalize'
@@ -32,20 +32,13 @@ const Welcome = ({ wallet }) => {
   return (
     <>
       <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
-    </>
-  );
-};
-const BuyTicket = ({ wallet }) => {
-  // const classes = useStyles();
-  // const { accountInfo } = wallet;
-  return (
-    <>
+      <br />
       <Button
         variant="contained"
         color="primary"
         size="large"
         onClick={() => alert('Coming Soon.')}>
-        Buy a Ticket
+        Buy a Lottery Ticket
       </Button>
       <br />
       <Button
@@ -81,24 +74,17 @@ const DashboardContainer = () => {
   const wallet = WAL.accessContext.getActiveWallets()[0];
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={6} lg={6}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
             <Welcome wallet={wallet} />
           </Wrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={6} lg={6}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
-            <Deposits wallet={wallet} />
-          </Wrapper>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={4} lg={4}>
-        <Paper className={fixedHeightPaper}>
-          <Wrapper wallet={wallet}>
-            <BuyTicket wallet={wallet} />
+            <Balance wallet={wallet} />
           </Wrapper>
         </Paper>
       </Grid>
