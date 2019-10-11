@@ -112,10 +112,6 @@ const DashboardContainer = () => {
 };
 
 class Dashboard extends React.Component {
-  logout = () => {
-    const wallet = WAL.accessContext.getActiveWallets()[0];
-    wallet.terminate();
-  };
   render() {
     return <DashboardContainer />;
   }

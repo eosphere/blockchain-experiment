@@ -37,7 +37,9 @@ export default function HeaderAppBar({ toggleTheme }) {
 
   const handleLogout = () => {
     const wallet = WAL.accessContext.getActiveWallets()[0];
-    wallet.terminate();
+    wallet.terminate().then(() => {
+      localStorage.removeItem('loggedIn');
+    });
   };
 
   const isLoggedIn = WAL.accessContext.getActiveWallets().length > 0;
