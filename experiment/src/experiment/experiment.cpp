@@ -345,9 +345,9 @@ void experiment::claim( const uint64_t& serial_no ){
    //transfer winning amount
    string memo { "Pay dividends for ticket: " + std::to_string(serial_no) };
    action(
-      permission_level{get_self(), "active"_n},
+      permission_level{ get_self(), "active"_n },
       c.deposit_token_contract, "transfer"_n,
-      std::make_tuple(c.deposit_token_contract, t_itr->purchaser, prize, memo))
+      std::make_tuple(get_self(), t_itr->purchaser, prize, memo))
    .send();
 
    //update ticket status to claimed
@@ -369,6 +369,14 @@ void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, 
    auto r_itr = r_t.find(drawnumber);
    check (!r_itr->open, "Draw is not closed yet!!");
 
+   //valid asset
+   for (auto aDiv : dividends) {
+      asset quantity = aDiv.second;
+      check( quantity.is_valid(), "invalid dividends" );
+      check( quantity.amount > 0, "Dividends must be positive value" );
+      check( quantity.symbol == c.deposit_symbol, "symbol precision mismatch" );
+   }
+   
    // set the numbers in the draw table record
    dividend_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
