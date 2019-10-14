@@ -79,11 +79,6 @@ const HeaderAppBar = props => {
       {() => (
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
-            {/* {isLoggedIn && (
-              <IconButton className={classes.menuButton} color="inherit" aria-label="menu">
-                <MdMenu />
-              </IconButton>
-            )} */}
             <Typography variant="h6" className={classes.title}>
               The Lott
             </Typography>

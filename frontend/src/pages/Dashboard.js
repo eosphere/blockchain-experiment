@@ -11,6 +11,7 @@ import Balance from 'components/Dashboard/Balance';
 import Transactions from 'components/Dashboard/Transactions';
 import Title from 'components/Dashboard/Title';
 import Admin from 'components/Dashboard/Admin';
+import Draws from 'components/Dashboard/Draws';
 import WAL from 'eos-transit';
 
 const useStyles = makeStyles(theme => ({
@@ -92,7 +93,14 @@ const Dashboard = () => {
           </Wrapper>
         </Paper>
       </Grid>
-      {wallet && <Admin wallet={wallet} fixedHeightPaper={fixedHeightPaper} />}
+      {wallet && <Admin wallet={wallet} paperStyle={classes.paper} />}
+
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          <Draws wallet={wallet} />
+        </Paper>
+      </Grid>
+
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}

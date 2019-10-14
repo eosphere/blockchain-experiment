@@ -2,7 +2,7 @@ import React from 'react';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Table from './Table';
+import Table from './TransactionsTable';
 import Title from './Title';
 
 class Transactions extends React.PureComponent {
@@ -11,8 +11,14 @@ class Transactions extends React.PureComponent {
     rows: {},
     customer: false
   };
+  mounted = false;
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
 
   async componentDidMount() {
+    this.mounted = true;
     const { wallet } = this.props;
     const {
       accountInfo: { account_name: accountName }
@@ -33,14 +39,14 @@ class Transactions extends React.PureComponent {
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
-      table: 'tickets',
       scope: TOKEN_SMARTCONTRACT,
+      table: 'tickets',
       limit: 20,
       reverse: true,
       ...filter
     });
     const { rows } = response;
-    this.setState({ rows, loading: false, customer });
+    this.mounted && this.setState({ rows, loading: false, customer });
   }
 
   render() {
