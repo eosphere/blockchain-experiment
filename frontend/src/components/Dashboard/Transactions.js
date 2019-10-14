@@ -13,17 +13,18 @@ class Transactions extends React.PureComponent {
 
   async componentDidMount() {
     const { wallet } = this.props;
-    // const {
-    //   accountInfo: { account_name: accountName }
-    // } = wallet;
+    const {
+      accountInfo: { account_name: accountName }
+    } = wallet;
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
       table: 'tickets',
       scope: TOKEN_SMARTCONTRACT,
-      key_type: `name`,
-      // lower_bound: accountName,
-      // index_position: 2,
+      key_type: `i64`,
+      upper_bound: accountName,
+      lower_bound: accountName,
+      index_position: 2,
       limit: 20,
       reverse: true
     });

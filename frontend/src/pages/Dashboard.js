@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -29,23 +30,25 @@ const useStyles = makeStyles(theme => ({
 const Welcome = ({ wallet }) => {
   const classes = useStyles();
   const { accountInfo } = wallet;
+  let history = useHistory();
+
+  const buyTicket = () => {
+    history.push('/buy/ticket');
+  };
+
+  const transfer = () => {
+    history.push('/transfer');
+  };
+
   return (
     <>
       <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
       <br />
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={() => alert('Coming Soon.')}>
+      <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
         Buy a Lottery Ticket
       </Button>
       <br />
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={() => alert('Coming Soon.')}>
+      <Button variant="contained" color="primary" size="large" onClick={transfer}>
         Transfer Funds
       </Button>
     </>
@@ -68,7 +71,7 @@ const Wrapper = ({ wallet, children }) => {
   return <>{children}</>;
 };
 
-const DashboardContainer = () => {
+const Dashboard = () => {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const wallet = WAL.accessContext.getActiveWallets()[0];
@@ -96,11 +99,5 @@ const DashboardContainer = () => {
     </Grid>
   );
 };
-
-class Dashboard extends React.Component {
-  render() {
-    return <DashboardContainer />;
-  }
-}
 
 export default Dashboard;
