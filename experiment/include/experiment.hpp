@@ -97,9 +97,10 @@ CONTRACT experiment : public contract {
       // table to maintain dividendCANCELLED
       struct [[ eosio::table, eosio::contract("experiment") ]] dividend
       {
-         uint64_t                      drawnumber           ;
+         uint64_t                      drawnumber          ;
          // winningtier and dividend map
-         std::map<uint8_t, double>     dividneds             ;
+         std::map<uint8_t, asset>     dividends            ;
+         uint64_t primary_key() const { return drawnumber; }
       };
       typedef multi_index<"dividends"_n, dividend> dividend_table;
 
@@ -131,7 +132,8 @@ CONTRACT experiment : public contract {
       //update ticket status and pay
       ACTION claim( const uint64_t& serial_no );
 
-      ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends);
+
+      ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends);
 
       //Erase all the table data expect for balance table
       ACTION reset(int limit);

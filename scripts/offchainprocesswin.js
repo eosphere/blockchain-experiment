@@ -1,22 +1,7 @@
-
-const { Api, JsonRpc, RpcError } = require('eosjs');
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');     
-const fetch = require('node-fetch');                                    // node only; not needed in browsers
-const { TextEncoder, TextDecoder } = require('util');                
-
-const defaultPrivateKey = "5KeWBLp3CAQwLZ8nccSBU7dXmz4axxATz7uZEN8K58qAQ2izjRd"; // experiment13
-//"5Ke3bVZBoyixVhhFtXUNPHn1fiDAYsPdi7L9CcBmL5aQrUCrGhN"; // experiment13
-const signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
-
-const rpc = new JsonRpc("https://hub.area240.com", { fetch });
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
-const drawno  = 2;
-const account = "experiment13";
+require('./config.js');
 var winnumbers = Array(6);
 var totalTickets = 0;
 var totalWinners = 0;
-
 
 async function getTickets () {
 
@@ -43,7 +28,9 @@ async function getTickets () {
         }
         //console.log ("No win for ticket : "+item.serialno +" entry no : "+item.entrynumbers);
     });
+
     console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    console.log ("runing node : " + url);
     console.log ("Total Draw tickets : "+tickets.rows.length+" for Draw no : "+drawno);
     console.log ("Total Open tickets : "+totalTickets);
     console.log ("Total Winning tickets : "+totalWinners);
@@ -103,5 +90,6 @@ async function getWinNumbers () {
         
     });
 }
+//TODO: check draw closed
 getWinNumbers ();
 setTimeout(getTickets,1000);
