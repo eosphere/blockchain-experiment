@@ -15,7 +15,7 @@ async function processwinning() {
 }
 
 async function processByTier(winning_tier) {
-    console.log ("Processing winnning tier " + winning_tier);
+    
     const tickets = await rpc.get_table_rows({
         "json": true,
         "code": account, 
@@ -27,6 +27,7 @@ async function processByTier(winning_tier) {
         "upper_bound": winning_tier,
         "limit": 10000,
     })
+    console.log ("Processing winnning tier " + winning_tier);
     tickets.rows.forEach(async function (item, index) {
         if (item.drawnumber != drawno || item.ticket_status != 0 || item.storeid > 0) {
             console.log("tickets ignored:" + JSON.stringify(item));
