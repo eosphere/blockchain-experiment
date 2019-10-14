@@ -7,9 +7,10 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
-import Balance from '../components/Dashboard/Balance';
-import Transactions from '../components/Dashboard/Transactions';
-import Title from '../components/Dashboard/Title';
+import Balance from 'components/Dashboard/Balance';
+import Transactions from 'components/Dashboard/Transactions';
+import Title from 'components/Dashboard/Title';
+import Admin from 'components/Dashboard/Admin';
 import WAL from 'eos-transit';
 
 const useStyles = makeStyles(theme => ({
@@ -91,6 +92,7 @@ const Dashboard = () => {
           </Wrapper>
         </Paper>
       </Grid>
+      {wallet && <Admin wallet={wallet} fixedHeightPaper={fixedHeightPaper} />}
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}

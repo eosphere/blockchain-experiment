@@ -53,16 +53,6 @@ const HeaderAppBar = props => {
     setAnchorEl(null);
   };
 
-  const handleProfile = () => {
-    handleClose();
-    props.history.push('/profile');
-  };
-
-  const handleDashboard = () => {
-    handleClose();
-    props.history.push('/');
-  };
-
   const handleLogout = () => {
     handleClose();
     const wallet = WAL.accessContext.getActiveWallets()[0];
@@ -82,12 +72,7 @@ const HeaderAppBar = props => {
     }
   }
 
-  const {
-    toggleTheme,
-    history: {
-      location: { pathname }
-    }
-  } = props;
+  const { toggleTheme } = props;
 
   return (
     <AccessContextSubscribe>
@@ -138,11 +123,6 @@ const HeaderAppBar = props => {
                   }}
                   open={open}
                   onClose={handleClose}>
-                  {pathname.includes('profile') ? (
-                    <MenuItem onClick={handleDashboard}>Dashboard</MenuItem>
-                  ) : (
-                    <MenuItem onClick={handleProfile}>My Profile</MenuItem>
-                  )}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </>

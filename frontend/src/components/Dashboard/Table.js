@@ -1,11 +1,14 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import {
+  makeStyles,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Chip
+} from '@material-ui/core';
 
 const columns = [
   {
@@ -16,7 +19,7 @@ const columns = [
   {
     label: 'Purchaser',
     key: 'purchaser',
-    order: 1
+    order: 7
   },
   {
     label: 'Draw No.',
@@ -46,12 +49,12 @@ const columns = [
   {
     label: 'Store',
     key: 'storeid',
-    order: 7
+    order: 8
   },
   {
     label: 'Purchase Date',
     key: 'created_date',
-    order: 8
+    order: 9
   }
 ];
 
@@ -84,7 +87,16 @@ const Numbers = ({ numbers }) => {
   );
 };
 
+const TicketStatus = ({ status }) => {
+  let label;
+  if (status === 0) label = 'Purchased';
+  else if (status === 1) label = 'Cancelled';
+  else if (status === 1) label = 'Claimed';
+  return label ? <Chip label={label} variant="outlined" size="small" /> : null;
+};
+
 const valuex = (key, value) => {
+  if (key.includes('ticket_status')) return <TicketStatus status={value} />;
   if (key.includes('entrynumbers')) return <Numbers numbers={value} />;
   if (key.includes('date')) return dayjs().format('DD/MM/YYYY h:m:s A');
   return value;

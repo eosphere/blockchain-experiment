@@ -8,7 +8,8 @@ import Title from './Title';
 class Transactions extends React.PureComponent {
   state = {
     loading: true,
-    rows: {}
+    rows: {},
+    customer: false
   };
 
   async componentDidMount() {
@@ -16,27 +17,37 @@ class Transactions extends React.PureComponent {
     const {
       accountInfo: { account_name: accountName }
     } = wallet;
+
+    let filter;
+    let customer = false;
+    if (accountName !== 'numberselect') {
+      filter = {
+        key_type: `i64`,
+        upper_bound: accountName,
+        lower_bound: accountName,
+        index_position: 2
+      };
+      customer = true;
+    }
+
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
       table: 'tickets',
       scope: TOKEN_SMARTCONTRACT,
-      key_type: `i64`,
-      upper_bound: accountName,
-      lower_bound: accountName,
-      index_position: 2,
       limit: 20,
-      reverse: true
+      reverse: true,
+      ...filter
     });
     const { rows } = response;
-    this.setState({ rows, loading: false });
+    this.setState({ rows, loading: false, customer });
   }
 
   render() {
-    const { rows, loading } = this.state;
+    const { rows, loading, customer } = this.state;
     return !loading ? (
       <>
-        <Title>Recent Transactions</Title>
+        <Title>{customer && `Your `}Recent Purchases</Title>
         <Table rows={rows} />
       </>
     ) : (
