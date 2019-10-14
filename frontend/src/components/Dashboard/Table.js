@@ -95,7 +95,18 @@ const TicketStatus = ({ status }) => {
   return label ? <Chip label={label} variant="outlined" size="small" /> : null;
 };
 
+const WinningTier = ({ tier }) => {
+  return tier !== 0 ? <Chip label={tier} variant="outlined" size="small" /> : '-';
+};
+
+const Store = ({ id }) => {
+  return id === 0 ? 'Online' : id;
+};
+
 const valuex = (key, value) => {
+  if (key.includes('store')) return <Store id={value} />;
+  if (key.includes('price')) return `$${value}`;
+  if (key.includes('winningtier')) return <WinningTier tier={value} />;
   if (key.includes('ticket_status')) return <TicketStatus status={value} />;
   if (key.includes('entrynumbers')) return <Numbers numbers={value} />;
   if (key.includes('date')) return dayjs().format('DD/MM/YYYY h:m:s A');
