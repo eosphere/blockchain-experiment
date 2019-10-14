@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using EosSharp.Core.Exceptions;
 
 namespace BlockChainLambda
 {
@@ -47,6 +48,17 @@ namespace BlockChainLambda
 
                     if (SendLogToConsole)
                         Console.WriteLine($"Attempt {attempt}, CreateTicket -> Thread Id : {Thread.CurrentThread.ManagedThreadId}, Transaction Id : {result}");
+                }
+                catch (ApiErrorException ex)
+                {
+                    if (SendLogToConsole)
+                    {
+                        Console.WriteLine($"Error.Name: {ex.error.name}, Error.What {ex.error.what}, Ticket {TicketAsString(ticket)}");
+                        foreach (var err in ex.error.details)
+                        {
+                            Console.WriteLine($"Message: {err.message}");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
