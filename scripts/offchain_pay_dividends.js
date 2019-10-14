@@ -1,23 +1,21 @@
-const { Api, JsonRpc, RpcError } = require('eosjs');
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');     
-const fetch = require('node-fetch');                                    // node only; not needed in browsers
-const { TextEncoder, TextDecoder } = require('util');                
-
-const defaultPrivateKey = "5JNQzM2iBr9ZhV9DSAoYPjMSn7KxVYSGLRFNFjXwP9FKU34UDZ6"; // bob
-const signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
-
-//const rpc = new JsonRpc("http://vsemppoceosbp1.area240.com:8888", { fetch });
-const rpc = new JsonRpc("http://localhost:8888", { fetch });
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
-const drawno  = 1;
-const account = "experiment11";
-const min_winning_tier = 1;
-const max_winning_tier = 3;
+require('./config.js');
 const winning_tier_index = 5;
 
-async function processTickets() {
 
+async function processwinning() {
+    let total_paid = 0;
+
+    const promises = range (min_winning_tier, max_winning_tier, 1).map(tier => processByTier(tier));
+    await Promise.all(promises);
+    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    console.log ("Draw " + drawno + " processed");
+    console.log ("Total " + total_paid + " ticket paid offchian.");
+    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    
+}
+
+async function processByTier(winning_tier) {
+    console.log ("Processing winnning tier " + winning_tier);
     const tickets = await rpc.get_table_rows({
         "json": true,
         "code": account, 
@@ -25,8 +23,8 @@ async function processTickets() {
         "table": "tickets", 
         "key_type": "i64",
         "index_position": winning_tier_index,
-        "lower_bound": min_winning_tier,
-        "upper_bound": max_winning_tier,
+        "lower_bound": winning_tier,
+        "upper_bound": winning_tier,
         "limit": 10000,
     })
     tickets.rows.forEach(async function (item, index) {
@@ -35,8 +33,8 @@ async function processTickets() {
             console.log("\n");
         } else {
             console.log("Pay dividends for :" + JSON.stringify(item));
-            //payDividend(item);
             claim (item.serialno, item.purchaser);
+            total_paid ++;
         }
     });
 }
@@ -68,7 +66,7 @@ async function claim (serialno, buyer) {
     )
     .then(function(result) {
         console.log (result);
-        console.log ("Success");
+        console.log ("Paid " + buyer);
     })
     .catch(function(e) {
         throw e;
@@ -76,4 +74,4 @@ async function claim (serialno, buyer) {
     
 }
 
-processTickets();
+processwinning();
