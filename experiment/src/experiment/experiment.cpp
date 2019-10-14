@@ -125,6 +125,7 @@ void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winn
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
+   check (!d_itr->open, "Must close draw first.");
 
    // require that set size is 6 and they are between 1 and 45 inclusive
    print ("Winning number size: ", std::to_string(winningnumbers.size()), "\n");
