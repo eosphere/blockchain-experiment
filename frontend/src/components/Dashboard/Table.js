@@ -59,6 +59,9 @@ const columns = [
 ];
 
 const useStyles = makeStyles(theme => ({
+  cell: {
+    textAlign: 'center'
+  },
   number: {
     width: '30px',
     height: '30px',
@@ -114,6 +117,7 @@ const valuex = (key, value) => {
 };
 
 const TableComponent = ({ rows }) => {
+  const classes = useStyles();
   return (
     <Table size="small">
       <TableHead>
@@ -121,7 +125,9 @@ const TableComponent = ({ rows }) => {
           {columns
             .sort((a, b) => a.order - b.order)
             .map(column => (
-              <TableCell key={column.key}>{column.label}</TableCell>
+              <TableCell className={classes.cell} key={column.key}>
+                {column.label}
+              </TableCell>
             ))}
         </TableRow>
       </TableHead>
@@ -132,7 +138,9 @@ const TableComponent = ({ rows }) => {
               {columns
                 .sort((a, b) => a.order - b.order)
                 .map(column => (
-                  <TableCell key={column.key}>{valuex(column.key, row[column.key])}</TableCell>
+                  <TableCell className={classes.cell} key={column.key}>
+                    {valuex(column.key, row[column.key])}
+                  </TableCell>
                 ))}
             </TableRow>
           ))}
