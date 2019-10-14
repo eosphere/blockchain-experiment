@@ -1,8 +1,8 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import Appbar from './Appbar';
-import Copyright from './Copyright';
+import { Appbar } from './Header';
+import Footer from './Footer';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,7 +32,7 @@ const MainLayout = ({ toggleTheme, children }) => {
           <Container maxWidth="lg" className={classes.container}>
             {children}
           </Container>
-          <Copyright />
+          <Footer />
         </main>
       </div>
     </>

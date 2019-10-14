@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import Balance from '../components/Dashboard/Balance';
-import Orders from '../components/Dashboard/Orders';
+import Transactions from '../components/Dashboard/Transactions';
 import Title from '../components/Dashboard/Title';
 import WAL from 'eos-transit';
 
@@ -90,7 +90,7 @@ const DashboardContainer = () => {
       </Grid>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <Orders />
+          {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}
         </Paper>
       </Grid>
     </Grid>

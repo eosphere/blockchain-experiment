@@ -9,7 +9,7 @@ import { MdAccountCircle } from 'react-icons/md';
 import { IoMdMoon } from 'react-icons/io';
 import Tooltip from '@material-ui/core/Tooltip';
 import WAL from 'eos-transit';
-import AccessContextSubscribe from '../transit/AccessContextSubscribe';
+import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import { MenuItem, Menu } from '@material-ui/core';
 import Balance from './Balance';
 

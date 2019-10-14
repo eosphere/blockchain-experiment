@@ -1,5 +1,5 @@
 import React from 'react';
-import { TOKEN_SMARTCONTRACT } from '../utils';
+import { TOKEN_SMARTCONTRACT } from 'utils';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -14,8 +14,8 @@ const Text = ({ funds }) => {
 
   return (
     <Typography variant="body1" className={classes.root}>
-      {funds.includes('AUD') && '$'}
-      {funds}
+      {funds && funds.includes('AUD') && '$'}
+      {funds || `$0`}
     </Typography>
   );
 };
@@ -28,7 +28,6 @@ class Balance extends React.PureComponent {
 
   async componentDidMount() {
     const { wallet } = this.props;
-    console.log(wallet);
     const name = wallet.accountInfo.account_name;
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,

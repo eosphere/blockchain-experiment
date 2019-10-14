@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { AuthenticatedRoute } from './components';
-import { Login, Dashboard, Profile, Transfer, BuyTicket } from './pages';
+import { Login, Dashboard, Profile, Transfer, BuyTicket, Admin } from './pages';
 
 const AppRoutes = () => {
   return (
@@ -14,6 +14,7 @@ const AppRoutes = () => {
             <Route path="/profile" exact={true} component={Profile} />
             <Route path="/transfer" exact={true} component={Transfer} />
             <Route path="/buy/ticket" exact={true} component={BuyTicket} />
+            <Route path="/admin" exact={true} component={Admin} />
           </Switch>
         )}
       </AuthenticatedRoute>

@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Title from './Title';
-import { TOKEN_SMARTCONTRACT } from '../../utils';
+import { TOKEN_SMARTCONTRACT } from 'utils';
 
 class Balance extends React.PureComponent {
   state = {
@@ -35,8 +35,8 @@ class Balance extends React.PureComponent {
             <Title>Total Balance</Title>
             <Typography component="p" variant="h4">
               <strong>
-                {funds.includes('AUD') && '$'}
-                {funds}
+                {funds && funds.includes('AUD') && '$'}
+                {funds || `$0`}
               </strong>
             </Typography>
             <Typography component="p" variant="body1">

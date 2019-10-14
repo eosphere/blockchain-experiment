@@ -1,2 +1,2 @@
-export { default as MainLayout } from './MainLayout';
+export { MainLayout } from './Layout';
 export { default as AuthenticatedRoute } from './AuthenticatedRoute';
