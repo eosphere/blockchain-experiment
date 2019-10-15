@@ -16,7 +16,8 @@ global.api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), t
 
 global.range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
-global.drawno  = 1;
-global.account = "experiment13";
+global.drawno  = 2;
+global.account = "experiment11";
 global.min_winning_tier = 1;
 global.max_winning_tier = 4;
+global.default_symbol = "2,AUD";
