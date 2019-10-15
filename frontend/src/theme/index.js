@@ -1,7 +1,9 @@
 import purple from '@material-ui/core/colors/purple';
+import { red } from '@material-ui/core/colors';
 
 const lightColors = {
-  primary: { ...purple, main: '#9F4A8F' }
+  primary: { ...purple, main: '#9F4A8F' },
+  secondary: { ...red, main: '#E63C2F' }
 };
 
 const lightTheme = {
@@ -12,7 +14,8 @@ const lightTheme = {
 };
 
 const darkColors = {
-  primary: { main: '#fff' }
+  primary: { main: '#fff' },
+  secondary: { main: '#E63C2F' }
 };
 
 const darkTheme = {

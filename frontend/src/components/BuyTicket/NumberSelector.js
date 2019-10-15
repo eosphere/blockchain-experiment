@@ -5,9 +5,23 @@ import { TOKEN_SMARTCONTRACT } from 'utils';
 import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import SelectDraw from './SelectDraw';
+import Ticket from './Ticket';
+import Message from '../Message';
+
+const NO_DRAW_ERROR = 'No draw selected. Please select a draw and your lucky numbers.';
+const NO_NUMBERS_ERROR = 'Please select your 6 lucky numbers.';
 
 class DrawSelector extends React.PureComponent {
-  state = { success: false, data: '', loading: true, draw: '', numbers: [1, 2, 3, 4, 5, 30] };
+  state = {
+    error: false,
+    errorMessage: '',
+    success: false,
+    data: '',
+    loading: true,
+    randomLoading: false,
+    draw: '',
+    numbers: []
+  };
 
   async componentDidMount() {
     const { wallet } = this.props;
@@ -25,18 +39,16 @@ class DrawSelector extends React.PureComponent {
   }
 
   onClick = value => {
-    this.setState({ draw: value, error: false });
+    this.setState({ draw: value, error: false, errorMessage: '' });
   };
 
   async onTransaction() {
-    console.log('onTransaction');
     const {
       wallet,
       wallet: { accountInfo }
     } = this.props;
     const { draw, numbers } = this.state;
     const { account_name: accountName } = accountInfo;
-    console.log(wallet);
     try {
       const response = await wallet.eosApi.transact(
         {
@@ -63,25 +75,64 @@ class DrawSelector extends React.PureComponent {
           expireSeconds: 30
         }
       );
-      console.log(response);
-      this.setState({ success: true });
-    } catch (err) {
-      // catches errors both in fetch and response.json
-      this.setState({ error: true });
+      this.setState({ success: true, transactionId: response.transaction_id });
+    } catch (error) {
+      const { message } = error;
+      this.setState({ error: true, errorMessage: `${message}. Please try again.` });
     }
   }
 
+  setError = errorMessage => {
+    this.setState({ error: true, errorMessage, randomLoading: false });
+  };
+
   onSubmit = () => {
-    const { draw } = this.state;
+    const { draw, numbers } = this.state;
+    this.setState({ success: false });
     if (!draw) {
-      this.setState({ error: true });
+      this.setError(NO_DRAW_ERROR);
+    } else if (numbers.length !== 6) {
+      this.setError(NO_NUMBERS_ERROR);
     } else {
       this.onTransaction();
     }
   };
 
+  updateNumbers = numbers => {
+    this.setState({ numbers, error: false, errorMessage: '', randomLoading: false });
+  };
+
+  async test() {
+    try {
+      let response = await fetch(
+        `https://www.random.org/integers/?num=6&digits=on&min=1&max=45&col=1&base=10&unique=on&format=plain`
+      );
+      const numberResponse = await response.text();
+      const splitNumbers = numberResponse.replace(/\r?\n|\r/g, ',');
+      const numberArray = JSON.parse(
+        '[' + splitNumbers.substring(0, splitNumbers.length - 1) + ']'
+      );
+      this.updateNumbers(numberArray);
+    } catch (error) {
+      this.setError('An error occured trying to generate random numbers. Please try again');
+    }
+  }
+
+  generateRandomNumbers = () => {
+    this.setState({ randomLoading: true }, () => this.test());
+  };
+
   render() {
-    const { loading, data, error, numbers, success } = this.state;
+    const {
+      loading,
+      data,
+      error,
+      errorMessage,
+      numbers,
+      success,
+      transactionId,
+      randomLoading
+    } = this.state;
     if (loading) {
       return (
         <Box
@@ -97,7 +148,19 @@ class DrawSelector extends React.PureComponent {
     return (
       <>
         <SelectDraw draws={data} onClick={this.onClick} />
-        <p>{numbers.toString()}</p>
+        <Ticket
+          loading={randomLoading}
+          numbers={numbers}
+          updateNumbers={this.updateNumbers}
+          generateRandomNumbers={this.generateRandomNumbers}
+        />
+        {error && <Message type="error" message={errorMessage} />}
+        {success && (
+          <Message
+            type="success"
+            message={`Transaction Successful. Transaction Id: ${transactionId}`}
+          />
+        )}
         <Button
           variant="contained"
           size="large"
@@ -106,8 +169,6 @@ class DrawSelector extends React.PureComponent {
           onClick={this.onSubmit}>
           Submit
         </Button>
-        {error && <p>An error has occured. Please try again.</p>}
-        {success && <p>Success !</p>}
       </>
     );
   }
@@ -132,6 +193,7 @@ class NumberSelector extends React.PureComponent {
               size="large"
               color="primary"
               type="submit"
+              style={{ marginTop: '8px' }}
               onClick={this.handleHome}>
               Back to Home
             </Button>

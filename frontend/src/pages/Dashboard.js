@@ -38,20 +38,12 @@ const Welcome = ({ wallet }) => {
     history.push('/buy/ticket');
   };
 
-  const transfer = () => {
-    history.push('/transfer');
-  };
-
   return (
     <>
       <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
       <br />
       <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
         Buy a Lottery Ticket
-      </Button>
-      <br />
-      <Button variant="contained" color="primary" size="large" onClick={transfer}>
-        Transfer Funds
       </Button>
     </>
   );
