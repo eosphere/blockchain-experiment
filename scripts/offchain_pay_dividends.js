@@ -55,7 +55,8 @@ async function claim (serialno, buyer) {
                 }
             ],
             data: {
-                serial_no: serialno
+                serial_no : serialno,
+                div_symbol: default_symbol
                 }
             }
         ]
