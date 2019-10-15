@@ -96,7 +96,7 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
    
    // NOTE: commented this out for now -- we will need an action to OPEN draw
-   check (d_itr->open == false, "Draw number is closed: " + std::to_string(drawnumber));
+   check (d_itr->open, "Draw number is closed: " + std::to_string(drawnumber));
 
    asset ticket_cost = asset { 100, c.deposit_symbol };  // ticket cost of 1 AUD
 
