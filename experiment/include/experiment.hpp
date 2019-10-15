@@ -39,6 +39,7 @@ CONTRACT experiment : public contract {
          name                    number_selector            ;
 
          // ....  other configurations can go here
+         std::map<symbol, double> token_exchange            ;
       };
 
       typedef singleton<"configs"_n, config> config_table;
@@ -130,7 +131,7 @@ CONTRACT experiment : public contract {
       //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
       //update ticket status and pay
-      ACTION claim( const uint64_t& serial_no );
+      ACTION claim( const uint64_t& serial_no, const symbol& div_symbol );
 
 
       ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends);
@@ -139,5 +140,7 @@ CONTRACT experiment : public contract {
       ACTION reset(int limit);
 
       //Update winningtier
-      ACTION updatewint(const uint64_t& serial_no,uint8_t win_tier);
+      ACTION updatewint( const uint64_t& serial_no,uint8_t win_tier );
+
+      ACTION setexchange ( const symbol& symbol, const double& rate );
 };
