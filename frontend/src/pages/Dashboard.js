@@ -10,7 +10,7 @@ import Box from '@material-ui/core/Box';
 import Balance from 'components/Dashboard/Balance';
 import Transactions from 'components/Dashboard/Transactions';
 import Title from 'components/Dashboard/Title';
-import Admin from 'components/Dashboard/Admin';
+import { AdminCard } from 'components/Admin';
 import Draws from 'components/Dashboard/Draws';
 import WAL from 'eos-transit';
 
@@ -85,7 +85,7 @@ const Dashboard = () => {
           </Wrapper>
         </Paper>
       </Grid>
-      {wallet && <Admin wallet={wallet} paperStyle={classes.paper} />}
+      {wallet && <AdminCard wallet={wallet} paperStyle={classes.paper} />}
 
       <Grid item xs={12}>
         <Paper className={classes.paper}>

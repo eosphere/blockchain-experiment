@@ -1,5 +1,5 @@
 import React from 'react';
-import dayjs from 'dayjs';
+import moment from 'moment';
 import {
   makeStyles,
   Table,
@@ -112,7 +112,11 @@ const renderCell = (key, value) => {
   if (key.includes('winningtier')) return <WinningTier tier={value} />;
   if (key.includes('ticket_status')) return <TicketStatus status={value} />;
   if (key.includes('entrynumbers')) return <Numbers numbers={value} />;
-  if (key.includes('date')) return dayjs(value).format('DD/MM/YYYY hh:mm A');
+  if (key.includes('date'))
+    return moment
+      .utc(value)
+      .local()
+      .format('DD/MM/YYYY hh:mm A');
   return value;
 };
 

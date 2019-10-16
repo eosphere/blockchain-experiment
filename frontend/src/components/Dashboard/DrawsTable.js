@@ -1,5 +1,5 @@
 import React from 'react';
-import dayjs from 'dayjs';
+import moment from 'moment';
 import {
   makeStyles,
   Table,
@@ -78,7 +78,11 @@ const DrawStatus = ({ status }) => {
 const renderCell = (key, value) => {
   if (key.includes('open')) return <DrawStatus status={value} />;
   if (key.includes('winningnumbers')) return <Numbers numbers={value} />;
-  if (key.includes('date')) return dayjs(value).format('DD/MM/YYYY hh:mm A');
+  if (key.includes('date'))
+    return moment
+      .utc(value)
+      .local()
+      .format('DD/MM/YYYY hh:mm A');
   return value;
 };
 

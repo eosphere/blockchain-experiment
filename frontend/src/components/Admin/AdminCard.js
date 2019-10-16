@@ -1,8 +1,9 @@
 import React from 'react';
 import { Grid, Paper } from '@material-ui/core';
-import Title from './Title';
+import Title from '../Dashboard/Title';
+import OpenDraw from './OpenDraw';
 
-const Admin = ({ wallet, paperStyle }) => {
+const AdminCard = ({ wallet, paperStyle }) => {
   const { accountInfo } = wallet;
   if (!accountInfo) return null;
   const { account_name: accountName } = accountInfo;
@@ -11,6 +12,7 @@ const Admin = ({ wallet, paperStyle }) => {
     <Grid item xs={12}>
       <Paper className={paperStyle}>
         <Title>Admin</Title>
+        <OpenDraw wallet={wallet} />
         <ul>
           <li>Open a draw </li>
           <li>Close a Draw</li>
@@ -26,4 +28,4 @@ const Admin = ({ wallet, paperStyle }) => {
   );
 };
 
-export default Admin;
+export default AdminCard;
