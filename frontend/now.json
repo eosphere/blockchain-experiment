@@ -5,7 +5,8 @@
       "REACT_APP_NETWORK_HOST": "hub.area240.com",
       "REACT_APP_NETWORK_PORT": "443",
       "REACT_APP_NETWORK_PROTOCOL": "https",
-      "REACT_APP_NETWORK_CHAIN_ID": "XXX"
+      "REACT_APP_NETWORK_CHAIN_ID": "XXX",
+      "REACT_APP_TOKEN_SMARTCONTRACT": "experiment13"
     }
   }
 }

@@ -4,9 +4,10 @@ import WAL from 'eos-transit';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { SvgIcon } from '@material-ui/core';
-import { ReactComponent as EOSLogo } from '../assets/eos-logo.svg';
-import { ReactComponent as ScatterLogo } from '../assets/scatter-logo.svg';
-import { LoginScreenWalletList } from '../components/Wallet';
+import { ReactComponent as EOSLogo } from 'assets/eos-logo.svg';
+import { ReactComponent as ScatterLogo } from 'assets/scatter-logo.svg';
+import { LoginScreenWalletList } from 'components/Wallet';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -37,7 +38,37 @@ const Icon = ({ type, children }) => {
 
 class Login extends React.PureComponent {
   state = {
-    showLoginProviders: false
+    showLoginProviders: false,
+    loading: true
+  };
+
+  componentDidMount() {
+    const thisContext = this;
+    // Deal with Localstorage removal delay.
+    setTimeout(function() {
+      if (localStorage.getItem('loggedIn')) {
+        return thisContext.attemptLogin();
+      }
+      thisContext.setState({ loading: false });
+    }, 50);
+  }
+
+  attemptLogin = () => {
+    const { getWalletProviders } = WAL.accessContext;
+    const providers = getWalletProviders();
+    const provider = providers[0];
+    const wallet = WAL.accessContext.initWallet(provider);
+    wallet.connect().then(() => {
+      wallet
+        .login()
+        .then(() => {
+          localStorage.setItem('loggedIn', true);
+        })
+        .catch(error => {
+          localStorage.removeItem('loggedIn');
+          this.setState({ showLoginProviders: true, loading: false });
+        });
+    });
   };
 
   isLoggedIn = () => !!WAL.accessContext.getActiveWallets().length;
@@ -50,14 +81,18 @@ class Login extends React.PureComponent {
     const wallet = WAL.accessContext.initWallet(walletProvider);
 
     wallet.connect().then(() => {
-      wallet.discover({ pathIndexList: [0, 1, 2, 3, 4, 5, 6] }).then(discoveryData => {
-        wallet.login();
+      wallet.login().then(() => {
+        localStorage.setItem('loggedIn', true);
       });
     });
   };
 
   handleWalletReconnectClick = wallet => {
-    wallet.connect().then(wallet.login);
+    wallet.connect().then(() => {
+      wallet.login().then(() => {
+        localStorage.setItem('loggedIn', true);
+      });
+    });
   };
 
   render() {
@@ -66,7 +101,7 @@ class Login extends React.PureComponent {
       toggleLoginProviders,
       handleWalletProviderSelect,
       handleWalletReconnectClick,
-      state: { showLoginProviders }
+      state: { showLoginProviders, loading }
     } = this;
     if (isLoggedIn()) return <Redirect to="/" />;
     const { getWallets, getWalletProviders } = WAL.accessContext;
@@ -84,11 +119,21 @@ class Login extends React.PureComponent {
           </>
         ) : (
           <>
-            <h1>Welcome to the Blockchain Experiment.</h1>
-            <Button variant="contained" size="large" color="primary" onClick={toggleLoginProviders}>
-              <Icon type="eos" />
-              Login with EOS
-            </Button>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <>
+                <h1 style={{ textAlign: 'center' }}>Welcome to the Blockchain Experiment.</h1>
+                <Button
+                  variant="contained"
+                  size="large"
+                  color="primary"
+                  onClick={toggleLoginProviders}>
+                  <Icon type="eos" />
+                  Login with EOS
+                </Button>
+              </>
+            )}
           </>
         )}
       </Container>

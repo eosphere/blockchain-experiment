@@ -1,14 +1,17 @@
 import React from 'react';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
-import Deposits from '../components/Dashboard/Deposits';
-import Orders from '../components/Dashboard/Orders';
-import Title from '../components/Dashboard/Title';
+import Balance from 'components/Dashboard/Balance';
+import Transactions from 'components/Dashboard/Transactions';
+import Title from 'components/Dashboard/Title';
+import Admin from 'components/Dashboard/Admin';
+import Draws from 'components/Dashboard/Draws';
 import WAL from 'eos-transit';
 
 const useStyles = makeStyles(theme => ({
@@ -19,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   fixedHeight: {
-    height: 150
+    height: 200
   },
   title: {
     textTransform: 'capitalize'
@@ -29,31 +32,18 @@ const useStyles = makeStyles(theme => ({
 const Welcome = ({ wallet }) => {
   const classes = useStyles();
   const { accountInfo } = wallet;
+  let history = useHistory();
+
+  const buyTicket = () => {
+    history.push('/buy/ticket');
+  };
+
   return (
     <>
       <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
-    </>
-  );
-};
-const BuyTicket = ({ wallet }) => {
-  // const classes = useStyles();
-  // const { accountInfo } = wallet;
-  return (
-    <>
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={() => alert('Coming Soon.')}>
-        Buy a Ticket
-      </Button>
       <br />
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={() => alert('Coming Soon.')}>
-        Transfer Funds
+      <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
+        Buy a Lottery Ticket
       </Button>
     </>
   );
@@ -75,50 +65,41 @@ const Wrapper = ({ wallet, children }) => {
   return <>{children}</>;
 };
 
-const DashboardContainer = () => {
+const Dashboard = () => {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const wallet = WAL.accessContext.getActiveWallets()[0];
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={6} lg={6}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
             <Welcome wallet={wallet} />
           </Wrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={6} lg={6}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
-            <Deposits wallet={wallet} />
+            <Balance wallet={wallet} />
           </Wrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={4} lg={4}>
-        <Paper className={fixedHeightPaper}>
-          <Wrapper wallet={wallet}>
-            <BuyTicket wallet={wallet} />
-          </Wrapper>
-        </Paper>
-      </Grid>
+      {wallet && <Admin wallet={wallet} paperStyle={classes.paper} />}
+
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <Orders />
+          <Draws wallet={wallet} />
+        </Paper>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}
         </Paper>
       </Grid>
     </Grid>
   );
 };
-
-class Dashboard extends React.Component {
-  logout = () => {
-    const wallet = WAL.accessContext.getActiveWallets()[0];
-    wallet.terminate();
-  };
-  render() {
-    return <DashboardContainer />;
-  }
-}
 
 export default Dashboard;

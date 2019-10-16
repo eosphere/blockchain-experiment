@@ -2,6 +2,7 @@
   "name": "eos-app",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
@@ -10,6 +11,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.5.0",
+    "dayjs": "^1.8.16",
     "eos-transit": "^4.0.1",
     "eos-transit-scatter-provider": "^4.0.1",
     "eosjs": "^20.0.0",
@@ -51,9 +53,10 @@
       "ie >= 11"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "ie >= 11"
     ]
   }
 }

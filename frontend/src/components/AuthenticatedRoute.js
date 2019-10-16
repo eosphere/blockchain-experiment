@@ -21,7 +21,6 @@ export function AuthenticatedRoute({ children, component, otherwiseRedirectTo, .
       render={props => {
         const isLoggedIn = !!WAL.accessContext.getActiveWallets().length;
         if (isLoggedIn) return renderComponent(props);
-
         return (
           <Redirect
             to={{
