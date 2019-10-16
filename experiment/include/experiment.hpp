@@ -125,22 +125,22 @@ CONTRACT experiment : public contract {
       ACTION withdraw ( const name& account, const asset& quantity );
 
       //update ticket status from ticket table, refund
-      ACTION cancelticket( const name& purchaser, const uint64_t& serial_no );
+      ACTION cancelticket( const name& purchaser, const uint64_t& serial_no, const uint64_t& drawnumber );
       
-      ACTION processwin(const uint64_t& serial_no );
+      ACTION processwin(const uint64_t& serial_no, const uint64_t& drawnumber );
       
       //update ticket by winning number
       //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
       //update ticket status and pay
-      ACTION claim( const uint64_t& serial_no );
+      ACTION claim( const uint64_t& serial_no, const uint64_t& drawnumber );
 
 
       ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends);
 
       //Erase all the table data expect for balance table
-      ACTION reset(int limit);
+      ACTION reset(int limit, const uint64_t& drawnumber);
 
       //Update winningtier
-      ACTION updatewint(const uint64_t& serial_no,uint8_t win_tier);
+      ACTION updatewint(const uint64_t& serial_no,uint8_t win_tier, const uint64_t& drawnumber);
 };
