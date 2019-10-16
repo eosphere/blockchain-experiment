@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { Box, CircularProgress, Button } from '@material-ui/core';
+import { Box, CircularProgress, Button, withStyles } from '@material-ui/core';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
@@ -11,11 +11,29 @@ import Message from '../Message';
 const NO_DRAW_ERROR = 'No draw selected. Please select a draw and your lucky numbers.';
 const NO_NUMBERS_ERROR = 'Please select your 6 lucky numbers.';
 
+const ColorCircularProgress = withStyles({
+  root: {
+    color: '#fff'
+  }
+})(CircularProgress);
+
+const SubmitButton = withStyles({
+  root: {
+    color: '#fff',
+    backgroundColor: '#ba68c8',
+    minHeight: '56px',
+    '&:hover': {
+      backgroundColor: '#ab47bc'
+    }
+  }
+})(Button);
+
 class DrawSelector extends React.PureComponent {
   state = {
     error: false,
     errorMessage: '',
     success: false,
+    pending: false,
     data: '',
     loading: true,
     randomLoading: false,
@@ -75,20 +93,20 @@ class DrawSelector extends React.PureComponent {
           expireSeconds: 30
         }
       );
-      this.setState({ success: true, transactionId: response.transaction_id });
+      this.setState({ pending: false, success: true, transactionId: response.transaction_id });
     } catch (error) {
       const { message } = error;
-      this.setState({ error: true, errorMessage: `${message}. Please try again.` });
+      this.setState({ pending: false, error: true, errorMessage: `${message}. Please try again.` });
     }
   }
 
   setError = errorMessage => {
-    this.setState({ error: true, errorMessage, randomLoading: false });
+    this.setState({ pending: false, error: true, errorMessage, randomLoading: false });
   };
 
   onSubmit = () => {
     const { draw, numbers } = this.state;
-    this.setState({ success: false });
+    this.setState({ pending: true, success: false, error: false, errorMessage: '' });
     if (!draw) {
       this.setError(NO_DRAW_ERROR);
     } else if (numbers.length !== 6) {
@@ -105,13 +123,10 @@ class DrawSelector extends React.PureComponent {
   async test() {
     try {
       let response = await fetch(
-        `https://www.random.org/integers/?num=6&digits=on&min=1&max=45&col=1&base=10&unique=on&format=plain`
+        `https://www.random.org/integer-sets/?sets=1&num=6&min=1&max=45&seqnos=off&commas=on&sort=on&order=index&format=plain&rnd=new`
       );
       const numberResponse = await response.text();
-      const splitNumbers = numberResponse.replace(/\r?\n|\r/g, ',');
-      const numberArray = JSON.parse(
-        '[' + splitNumbers.substring(0, splitNumbers.length - 1) + ']'
-      );
+      const numberArray = JSON.parse('[' + numberResponse + ']');
       this.updateNumbers(numberArray);
     } catch (error) {
       this.setError('An error occured trying to generate random numbers. Please try again');
@@ -125,6 +140,7 @@ class DrawSelector extends React.PureComponent {
   render() {
     const {
       loading,
+      pending,
       data,
       error,
       errorMessage,
@@ -161,14 +177,14 @@ class DrawSelector extends React.PureComponent {
             message={`Transaction Successful. Transaction Id: ${transactionId}`}
           />
         )}
-        <Button
+        <SubmitButton
           variant="contained"
           size="large"
           color="primary"
           type="submit"
           onClick={this.onSubmit}>
-          Submit
-        </Button>
+          {pending ? <ColorCircularProgress /> : `Buy Ticket`}
+        </SubmitButton>
       </>
     );
   }
@@ -190,8 +206,8 @@ class NumberSelector extends React.PureComponent {
             <DrawSelector wallet={wallet} />
             <Button
               variant="contained"
+              color="default"
               size="large"
-              color="primary"
               type="submit"
               style={{ marginTop: '8px' }}
               onClick={this.handleHome}>

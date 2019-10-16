@@ -15,7 +15,7 @@ const lightTheme = {
 
 const darkColors = {
   primary: { main: '#fff' },
-  secondary: { main: '#E63C2F' }
+  secondary: { ...red, main: '#E63C2F' }
 };
 
 const darkTheme = {
