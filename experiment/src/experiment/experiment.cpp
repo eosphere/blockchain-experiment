@@ -103,7 +103,7 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    });
    
    // add ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    t_t.emplace (get_self(), [&](auto &t) {
       t.serialno        = t_t.available_primary_key();
       t.purchaser       = purchaser;
@@ -212,7 +212,7 @@ void experiment::withdraw (const name& account, const asset& quantity) {
    .send();
 }
 
-void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
+void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no, const uint64_t& drawnumber){
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
    
@@ -221,7 +221,7 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
    check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
 
    //check ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
    check (t_itr->ticket_status == PURCHASED, "Ticket cannot be cancelled if cancelled or claimed.");
@@ -275,7 +275,7 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
 //    //update ticket table, only can be perfomed by numberSelector account
 // }
 
-void experiment::processwin(const uint64_t& serial_no){
+void experiment::processwin(const uint64_t& serial_no, const uint64_t& drawnumber){
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
    
@@ -284,7 +284,7 @@ void experiment::processwin(const uint64_t& serial_no){
    check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
 
    //check ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
    check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
@@ -310,7 +310,7 @@ void experiment::processwin(const uint64_t& serial_no){
   
 }
 
-void experiment::claim( const uint64_t& serial_no ){
+void experiment::claim( const uint64_t& serial_no, const uint64_t& drawnumber ){
 
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
@@ -320,16 +320,16 @@ void experiment::claim( const uint64_t& serial_no ){
    check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
 
    //check ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
    check (t_itr->ticket_status == PURCHASED, "Ticket cannot be claimed");
    
    //validate the winning number
    if (t_itr->winningtier == 0) {
-      processwin (serial_no);
+      processwin (serial_no, drawnumber);
    }
-   ticket_table tt_t (get_self(), get_self().value);
+   ticket_table tt_t (get_self(), drawnumber);
    t_itr = tt_t.find (serial_no);
    check (t_itr->winningtier>0, "Sorry, your are not win.");
 
@@ -398,10 +398,10 @@ void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, 
 
 
 //Erase all the table data expect for balance table
-void experiment::reset(int limit){
+void experiment::reset(int limit, const uint64_t& drawnumber){
     require_auth (get_self());
 
-    ticket_table t_t (get_self(), get_self().value);
+    ticket_table t_t (get_self(), drawnumber);
     auto tt_itr = t_t.begin ();
 
     for(int i =0; i<= limit;i++){
@@ -421,11 +421,11 @@ void experiment::reset(int limit){
 }
 
 //update the winning tier for specific ticket number (serial no)
-void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier){
+void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier, const uint64_t& drawnumber){
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
 
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
