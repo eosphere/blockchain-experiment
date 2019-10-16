@@ -51,7 +51,8 @@ async function createticket () {
             data: {
                 purchaser: "ticketbuyer1",
                 drawnumber: drawno,
-                entrynumbers: await exports.getNumbers()
+                entrynumbers: await exports.getNumbers(),
+                genreward: true
              }
             }
         ]

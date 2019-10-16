@@ -19,7 +19,8 @@ async function createticket (buyer) {
             data: {
                 purchaser: buyer,
                 drawnumber: drawno,
-                entrynumbers: await createModule.getNumbers()
+                entrynumbers: await createModule.getNumbers(),
+                genreward: true
              }
             }
         ]
