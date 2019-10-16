@@ -115,8 +115,8 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    //generate reward token to user
    if (genreward) {
       string memo { "Thanks for playing" };
-      asset lott = asset(1000.00, symbol("LTT",2));
-      print ("Reward lott = " + lott.to_string());
+      asset lott = REWARD_ASSET;
+      //print ("Reward lott = " + lott.to_string());
       action (
          permission_level( get_self(), "active"_n),
          c.deposit_token_contract, "transfer"_n,

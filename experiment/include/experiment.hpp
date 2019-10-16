@@ -18,6 +18,9 @@ CONTRACT experiment : public contract {
          CLAIMED = 2
       };
 
+
+      const asset REWARD_ASSET = asset(1000.00, symbol("LOTT",2));
+
    public:
       using contract::contract;
 
