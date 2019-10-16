@@ -326,7 +326,7 @@ void experiment::claim( const uint64_t& serial_no, const uint64_t& drawnumber ){
    
    //validate the winning number
    if (t_itr->winningtier == 0) {
-      processwin (serial_no);
+      processwin (serial_no, drawnumber);
    }
    ticket_table tt_t (get_self(), drawnumber);
    t_itr = tt_t.find (serial_no);
