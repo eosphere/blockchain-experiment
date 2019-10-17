@@ -18,6 +18,9 @@ CONTRACT experiment : public contract {
          CLAIMED = 2
       };
 
+
+      const asset REWARD_ASSET = asset(1000.00, symbol("LOTT",2));
+
    public:
       using contract::contract;
 
@@ -112,7 +115,7 @@ CONTRACT experiment : public contract {
       
       ACTION createdraw ();
       ACTION closedraw ( const uint64_t& drawnumber );
-      ACTION createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers);
+      ACTION createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers, const bool& genreward);
       ACTION setwinnums (const uint64_t& drawnumber, const set<uint8_t> winningnumbers);
 
       // deposit handler -- this triggers whenever the contract receives tokens

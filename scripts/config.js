@@ -5,6 +5,8 @@ const { TextEncoder, TextDecoder } = require('util');
 
 global.crypto = require ('crypto');          
 global.defaultPrivateKey = "5KeWBLp3CAQwLZ8nccSBU7dXmz4axxATz7uZEN8K58qAQ2izjRd"; 
+// 5KeWBLp3CAQwLZ8nccSBU7dXmz4axxATz7uZEN8K58qAQ2izjRd net
+// 5JNQzM2iBr9ZhV9DSAoYPjMSn7KxVYSGLRFNFjXwP9FKU34UDZ6 local
 
 global.signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
 global.url = "http://vsemppoceosfn2.area240.com:8888";

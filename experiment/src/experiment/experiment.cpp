@@ -63,7 +63,7 @@ void experiment::closedraw (const uint64_t& drawnumber) {
    });
 }
 
-void experiment::createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers) {
+void experiment::createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers, const bool& genreward) {
 
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
@@ -111,6 +111,18 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
       t.drawnumber      = drawnumber;
       t.price           = ticket_cost;
    });
+
+   //generate reward token to user
+   if (genreward) {
+      string memo { "Thanks for playing" };
+      asset lott = REWARD_ASSET;
+      //print ("Reward lott = " + lott.to_string());
+      action (
+         permission_level( get_self(), "active"_n),
+         c.deposit_token_contract, "transfer"_n,
+         std::make_tuple(get_self(), purchaser, lott, memo)
+      ).send();
+   }
 }
 
 void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winningnumbers) {
@@ -125,6 +137,7 @@ void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winn
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
+   check (!d_itr->open, "Must close draw first.");
 
    // require that set size is 6 and they are between 1 and 45 inclusive
    print ("Winning number size: ", std::to_string(winningnumbers.size()), "\n");
@@ -149,29 +162,37 @@ void experiment::deposit ( const name& from, const name& to, const asset& quanti
    // ensure that the symbol and token contract match acceptable configuration
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
-   check (quantity.symbol == c.deposit_symbol, "Only deposits of configured symbol are allowed. You sent: " + quantity.to_string());
+   asset final_amount = quantity;
+   if (from != c.deposit_token_contract) {
+      if (quantity.symbol != c.deposit_symbol) {
+         //convert to AUD
+         final_amount = asset(quantity.amount / 30, c.deposit_symbol);
+      }
+
+      //check (quantity.symbol == c.deposit_symbol, "Only deposits of configured symbol are allowed. You sent: " + quantity.to_string());
+   }
    check (token_contract == c.deposit_token_contract, "Only deposits from configured token contract are allowed. You sent from: " 
       + token_contract.to_string() + "; Configured contract: " + c.deposit_token_contract.to_string());
 
    balance_table balances(get_self(), from.value);
    asset new_balance;
-   auto it = balances.find(quantity.symbol.code().raw());
+   auto it = balances.find(final_amount.symbol.code().raw());
    if(it != balances.end()) {
       check (it->token_contract == token_contract, "Transfer does not match existing token contract.");
       balances.modify(it, get_self(), [&](auto& bal){
-         bal.funds += quantity;
+         bal.funds += final_amount;
          new_balance = bal.funds;
       });
    } else {
       balances.emplace(get_self(), [&](auto& bal){
-         bal.funds = quantity;
+         bal.funds = final_amount;
          bal.token_contract  = token_contract;
-         new_balance = quantity;
+         new_balance = final_amount;
       });
    }
 
    print ("\n");
-   print(name{from}, " deposited:       ", quantity, "\n");
+   print(name{from}, " deposited:       ", final_amount, "\n");
    print(name{from}, " funds available: ", new_balance);
    print ("\n");
 }
@@ -343,7 +364,7 @@ void experiment::claim( const uint64_t& serial_no, const uint64_t& drawnumber ){
    check (prize.amount > 0, "Ooops, no price for tier" + std::to_string(t_itr->winningtier));
 
    //transfer winning amount
-   string memo { "Pay dividends for ticket: " + std::to_string(serial_no) };
+   string memo { "Paid " + prize.to_string() + " for ticket: " + std::to_string(serial_no) };
    action(
       permission_level{ get_self(), "active"_n },
       c.deposit_token_contract, "transfer"_n,

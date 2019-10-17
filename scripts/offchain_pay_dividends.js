@@ -1,17 +1,16 @@
 require('./config.js');
 const winning_tier_index = 5;
-
+let total_paid = 0;
 
 async function processwinning() {
-    let total_paid = 0;
 
     const promises = range (min_winning_tier, max_winning_tier, 1).map(tier => processByTier(tier));
-    await Promise.all(promises);
-    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    console.log ("Draw " + drawno + " processed");
-    console.log ("Total " + total_paid + " ticket paid offchian.");
-    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    
+    Promise.all(promises).then(() => {
+        console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        console.log ("Draw " + drawno + " processed");
+        console.log ("Total " + total_paid + " tickets paid offchian.");
+        console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    });
 }
 
 async function processByTier(winning_tier) {
@@ -19,7 +18,7 @@ async function processByTier(winning_tier) {
     const tickets = await rpc.get_table_rows({
         "json": true,
         "code": account, 
-        "scope": account, 
+        "scope": drawno, 
         "table": "tickets", 
         "key_type": "i64",
         "index_position": winning_tier_index,
@@ -55,7 +54,8 @@ async function claim (serialno, buyer) {
                 }
             ],
             data: {
-                serial_no: serialno
+                serial_no: serialno,
+                drawnumber: drawno
                 }
             }
         ]
