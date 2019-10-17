@@ -6,14 +6,29 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Box,
-  CircularProgress
+  CircularProgress,
+  makeStyles,
+  Tooltip
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
+import { MdRemoveCircle } from 'react-icons/md';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import Message from '../Message';
 
-const OpenDrawDialog = ({
+const useStyles = makeStyles(theme => ({
+  root: {
+    minWidth: '0',
+    padding: '10px',
+    backgroundColor: theme.palette.error.main,
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark
+    }
+  },
+  icon: {
+    color: '#fff'
+  }
+}));
+
+const CancelTicketDialog = ({
   success,
   error,
   errorMessage,
@@ -22,6 +37,8 @@ const OpenDrawDialog = ({
   toggleDialog,
   onSubmit,
   redirect,
+  drawnumber,
+  serialno,
   transactionId
 }) => {
   return (
@@ -29,20 +46,25 @@ const OpenDrawDialog = ({
       open={open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{success ? 'Success' : 'Confirmation'}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {success ? 'Cancel Success' : 'Cancel Confirmation'}
+      </DialogTitle>
       <DialogContent>
         {!success && (
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to open a new draw?
+            Are you sure you want to cancel Ticket <strong>Serial No. {serialno}</strong> on{' '}
+            <strong>Draw No. {drawnumber}</strong>?
           </DialogContentText>
         )}
         {success && (
           <DialogContentText id="alert-dialog-description">
-            <Message
-              type="success"
-              message={`New draw successfully created. `}
-              transactionId={transactionId}
-            />
+            <>
+              <Message
+                type="success"
+                message={`Ticket Serial No. ${serialno} on Draw No. ${drawnumber} cancelled successfully. `}
+                transactionId={transactionId}
+              />
+            </>
           </DialogContentText>
         )}
         {error && <Message type="error" message={errorMessage} />}
@@ -78,7 +100,18 @@ const OpenDrawDialog = ({
   );
 };
 
-class OpenDraw extends React.PureComponent {
+const CancelButton = ({ onClick }) => {
+  const classes = useStyles();
+  return (
+    <Tooltip title="Cancel Ticket" aria-label="cancel-ticket">
+      <Button className={classes.root} size="small" color="default" onClick={onClick}>
+        <MdRemoveCircle className={classes.icon} />
+      </Button>
+    </Tooltip>
+  );
+};
+
+class CancelTicket extends React.PureComponent {
   constructor(props) {
     super(props);
     this.initialState = {
@@ -114,29 +147,35 @@ class OpenDraw extends React.PureComponent {
         errorMessage: '',
         loading: !prevState.loading
       }),
-      () => this.openDraw()
+      () => this.cancelTicket()
     );
   };
 
-  async openDraw() {
-    const { wallet } = this.props;
+  async cancelTicket() {
+    const { wallet, ticket } = this.props;
     const {
       accountInfo: { account_name: accountName }
     } = wallet;
+    const { purchaser, serialno, drawnumber } = ticket;
+
     try {
       const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
               account: TOKEN_SMARTCONTRACT,
-              name: 'createdraw',
+              name: 'cancelticket',
               authorization: [
                 {
                   actor: accountName,
                   permission: 'active'
                 }
               ],
-              data: {}
+              data: {
+                purchaser,
+                serial_no: serialno,
+                drawnumber
+              }
             }
           ]
         },
@@ -148,12 +187,7 @@ class OpenDraw extends React.PureComponent {
       this.setState({ loading: false, success: true, transactionId });
     } catch (error) {
       const { message } = error;
-      this.setState({
-        transactionId: '',
-        loading: false,
-        error: true,
-        errorMessage: `${message}. Please try again.`
-      });
+      this.setState({ transactionId: '', loading: false, error: true, errorMessage: message });
     }
   }
 
@@ -163,35 +197,32 @@ class OpenDraw extends React.PureComponent {
 
   render() {
     const { open, loading, error, errorMessage, success, transactionId } = this.state;
+    const { ticket } = this.props;
+    const { drawnumber, serialno, ticket_status: status } = ticket;
+    const isPurchased = status === 0;
     return (
-      <Box>
-        <Button variant="contained" color="primary" onClick={this.toggleDialog}>
-          Create New Draw
-        </Button>
-        <OpenDrawDialog
-          error={error}
-          errorMessage={errorMessage}
-          success={success}
-          redirect={this.redirect}
-          open={open}
-          loading={loading}
-          toggleDialog={this.toggleDialog}
-          onSubmit={this.onSubmit}
-          transactionId={transactionId}
-        />
-      </Box>
+      <>
+        {isPurchased ? (
+          <>
+            <CancelButton onClick={this.toggleDialog} />
+            <CancelTicketDialog
+              error={error}
+              errorMessage={errorMessage}
+              success={success}
+              redirect={this.redirect}
+              open={open}
+              loading={loading}
+              toggleDialog={this.toggleDialog}
+              onSubmit={this.onSubmit}
+              drawnumber={drawnumber}
+              serialno={serialno}
+              transactionId={transactionId}
+            />
+          </>
+        ) : null}
+      </>
     );
   }
 }
 
-const OpenDrawContainer = ({ wallet }) => {
-  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
-  if (!isAdmin) return null;
-  return (
-    <Box display="flex" justifyContent="flex-end" marginBottom={1}>
-      <OpenDraw wallet={wallet} />
-    </Box>
-  );
-};
-
-export default OpenDrawContainer;
+export default CancelTicket;

@@ -21,7 +21,8 @@ const CloseDrawDialog = ({
   toggleDialog,
   onSubmit,
   redirect,
-  drawnumber
+  drawnumber,
+  transactionId
 }) => {
   return (
     <Dialog
@@ -39,7 +40,11 @@ const CloseDrawDialog = ({
         )}
         {success && (
           <DialogContentText id="alert-dialog-description">
-            <Message type="success" message={`Draw No. ${drawnumber} closed successfully.`} />
+            <Message
+              type="success"
+              message={`Draw No. ${drawnumber} closed successfully. `}
+              transactionId={transactionId}
+            />
           </DialogContentText>
         )}
         {error && <Message type="error" message={errorMessage} />}
@@ -83,7 +88,8 @@ class CloseDraw extends React.PureComponent {
       loading: false,
       error: false,
       errorMessage: '',
-      success: false
+      success: false,
+      transactionId: ''
     };
   }
 
@@ -97,13 +103,19 @@ class CloseDraw extends React.PureComponent {
       loading: false,
       error: false,
       errorMessage: '',
-      success: false
+      success: false,
+      transactionId: ''
     }));
   };
 
   onSubmit = () => {
     this.setState(
-      prevState => ({ error: false, errorMessage: '', loading: !prevState.loading }),
+      prevState => ({
+        transactionId: '',
+        error: false,
+        errorMessage: '',
+        loading: !prevState.loading
+      }),
       () => this.closeDraw()
     );
   };
@@ -114,7 +126,7 @@ class CloseDraw extends React.PureComponent {
       accountInfo: { account_name: accountName }
     } = wallet;
     try {
-      await wallet.eosApi.transact(
+      const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
@@ -135,10 +147,15 @@ class CloseDraw extends React.PureComponent {
           expireSeconds: 60
         }
       );
-      this.setState({ loading: false, success: true });
+      this.setState({ loading: false, success: true, transactionId });
     } catch (error) {
       const { message } = error;
-      this.setState({ loading: false, error: true, errorMessage: `${message}. Please try again.` });
+      this.setState({
+        transactionId: '',
+        loading: false,
+        error: true,
+        errorMessage: `${message}. Please try again.`
+      });
     }
   }
 
@@ -147,7 +164,7 @@ class CloseDraw extends React.PureComponent {
   };
 
   render() {
-    const { open, loading, error, errorMessage, success } = this.state;
+    const { open, loading, error, errorMessage, success, transactionId } = this.state;
     const { drawnumber } = this.props;
     return (
       <>
@@ -164,6 +181,7 @@ class CloseDraw extends React.PureComponent {
           toggleDialog={this.toggleDialog}
           onSubmit={this.onSubmit}
           drawnumber={drawnumber}
+          transactionId={transactionId}
         />
       </>
     );

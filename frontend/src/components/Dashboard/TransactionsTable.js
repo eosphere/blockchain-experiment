@@ -9,6 +9,7 @@ import {
   TableRow,
   Chip
 } from '@material-ui/core';
+import { CancelTicket } from '../BuyTicket';
 
 const columns = [
   {
@@ -47,13 +48,13 @@ const columns = [
     order: 6
   },
   {
-    label: 'Store',
-    key: 'storeid',
+    label: 'Purchase Date',
+    key: 'created_date',
     order: 8
   },
   {
-    label: 'Purchase Date',
-    key: 'created_date',
+    label: '',
+    key: 'actions',
     order: 9
   }
 ];
@@ -102,12 +103,8 @@ const WinningTier = ({ tier }) => {
   return tier !== 0 ? <Chip label={tier} variant="outlined" size="small" /> : '-';
 };
 
-const Store = ({ id }) => {
-  return id === 0 ? 'Online' : id;
-};
-
-const renderCell = (key, value) => {
-  if (key.includes('store')) return <Store id={value} />;
+const renderCell = (key, value, ticket, wallet) => {
+  if (key.includes('actions')) return <CancelTicket wallet={wallet} ticket={ticket} />;
   if (key.includes('price')) return `$${value}`;
   if (key.includes('winningtier')) return <WinningTier tier={value} />;
   if (key.includes('ticket_status')) return <TicketStatus status={value} />;
@@ -120,7 +117,7 @@ const renderCell = (key, value) => {
   return value;
 };
 
-const TableComponent = ({ rows }) => {
+const TableComponent = ({ rows, wallet }) => {
   const classes = useStyles();
   return (
     <Table size="small">
@@ -143,7 +140,7 @@ const TableComponent = ({ rows }) => {
                 .sort((a, b) => a.order - b.order)
                 .map(column => (
                   <TableCell className={classes.cell} key={column.key}>
-                    {renderCell(column.key, row[column.key])}
+                    {renderCell(column.key, row[column.key], row, wallet)}
                   </TableCell>
                 ))}
             </TableRow>

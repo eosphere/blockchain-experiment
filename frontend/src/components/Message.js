@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, makeStyles } from '@material-ui/core';
+import { Box, Link, makeStyles } from '@material-ui/core';
 import { green } from '@material-ui/core/colors';
 import { MdError, MdCheckCircle } from 'react-icons/md';
+import { NETWORK_HOST, SYSTEM_DOMAIN, CORE_SYMBOL } from 'utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,16 +19,39 @@ const useStyles = makeStyles(theme => ({
     width: '20px',
     height: '20px',
     marginRight: theme.spacing(1)
+  },
+  link: {
+    fontWeight: 900,
+    marginLeft: '3px',
+    color: 'white',
+    textDecoration: 'underline'
   }
 }));
 
-const Message = ({ type, message }) => {
+const buildTransactionUrl = transactionId => {
+  return `https://local.bloks.io/transaction/${transactionId}?nodeUrl=${NETWORK_HOST}&coreSymbol=${CORE_SYMBOL}&systemDomain=${SYSTEM_DOMAIN}`;
+};
+
+const Message = ({ type, message, transactionId }) => {
   const classes = useStyles();
   return (
-    <Box display="flex" flexWrap="wrap" className={`${classes.root} ${classes[type]}`}>
+    <Box
+      component="span"
+      display="inline-flex"
+      flexWrap="wrap"
+      className={`${classes.root} ${classes[type]}`}>
       {type === 'success' && <MdCheckCircle className={classes.icon} />}
       {type === 'error' && <MdError className={classes.icon} />}
       {message}
+      {transactionId && (
+        <Link
+          href={buildTransactionUrl(transactionId)}
+          target="_blank"
+          rel="noreferrer noopener"
+          className={classes.link}>
+          View Transaction
+        </Link>
+      )}
     </Box>
   );
 };

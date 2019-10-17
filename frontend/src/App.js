@@ -8,16 +8,16 @@ import AccessContextSubscribe from './transit/AccessContextSubscribe';
 import './transit/initTransit.js';
 import AppRoutes from './AppRoutes';
 import { MainLayout } from './components';
-import { isProduction } from 'utils';
+// import { isProduction } from 'utils';
 
 const store = configureStore();
 
 const App = () => {
-  if (isProduction) {
-    window.onbeforeunload = function() {
-      return 'Data will be lost if you leave the page, are you sure?';
-    };
-  }
+  // if (isProduction) {
+  //   window.onbeforeunload = function() {
+  //     return 'Data will be lost if you leave the page, are you sure?';
+  //   };
+  // }
 
   const recentTheme = localStorage.getItem('theme');
   const useTheme = recentTheme === 'light' ? lightTheme : darkTheme;

@@ -38,7 +38,8 @@ class DrawSelector extends React.PureComponent {
     loading: true,
     randomLoading: false,
     draw: '',
-    numbers: []
+    numbers: [],
+    transactionId: ''
   };
 
   async componentDidMount() {
@@ -57,7 +58,7 @@ class DrawSelector extends React.PureComponent {
   }
 
   onClick = value => {
-    this.setState({ draw: value, error: false, errorMessage: '' });
+    this.setState({ draw: value, error: false, errorMessage: '', transactionId: '' });
   };
 
   async onTransaction() {
@@ -68,7 +69,7 @@ class DrawSelector extends React.PureComponent {
     const { draw, numbers } = this.state;
     const { account_name: accountName } = accountInfo;
     try {
-      const response = await wallet.eosApi.transact(
+      const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
@@ -94,20 +95,37 @@ class DrawSelector extends React.PureComponent {
           expireSeconds: 60
         }
       );
-      this.setState({ pending: false, success: true, transactionId: response.transaction_id });
+      this.setState({ pending: false, success: true, transactionId });
     } catch (error) {
       const { message } = error;
-      this.setState({ pending: false, error: true, errorMessage: `${message}. Please try again.` });
+      this.setState({
+        transactionId: '',
+        pending: false,
+        error: true,
+        errorMessage: `${message}. Please try again.`
+      });
     }
   }
 
   setError = errorMessage => {
-    this.setState({ pending: false, error: true, errorMessage, randomLoading: false });
+    this.setState({
+      transactionId: '',
+      pending: false,
+      error: true,
+      errorMessage,
+      randomLoading: false
+    });
   };
 
   onSubmit = () => {
     const { draw, numbers } = this.state;
-    this.setState({ pending: true, success: false, error: false, errorMessage: '' });
+    this.setState({
+      transactionId: '',
+      pending: true,
+      success: false,
+      error: false,
+      errorMessage: ''
+    });
     if (!draw) {
       this.setError(NO_DRAW_ERROR);
     } else if (numbers.length !== 6) {
@@ -175,7 +193,8 @@ class DrawSelector extends React.PureComponent {
         {success && (
           <Message
             type="success"
-            message={`Transaction Successful. Transaction Id: ${transactionId}`}
+            message={`Transaction Successful.`}
+            transactionId={transactionId}
           />
         )}
         <SubmitButton

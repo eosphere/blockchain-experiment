@@ -96,12 +96,12 @@ const Dashboard = () => {
       </Grid>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <Draws wallet={wallet} />
+          {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}
         </Paper>
       </Grid>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}
+          <Draws wallet={wallet} />
         </Paper>
       </Grid>
     </Grid>

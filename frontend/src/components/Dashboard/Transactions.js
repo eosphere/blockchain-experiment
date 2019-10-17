@@ -39,9 +39,9 @@ class Transactions extends React.PureComponent {
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
-      scope: '11',
+      scope: '29',
       table: 'tickets',
-      limit: 300,
+      limit: 20,
       reverse: true,
       ...filter
     });
@@ -51,10 +51,11 @@ class Transactions extends React.PureComponent {
 
   render() {
     const { rows, loading, customer } = this.state;
+    const { wallet } = this.props;
     return !loading ? (
       <>
         <Title>{customer && `Your `}Recent Purchases</Title>
-        <Table rows={rows} />
+        <Table rows={rows} wallet={wallet} />
       </>
     ) : (
       // <SelectDraw draws={data} onClick={this.onClick} />
