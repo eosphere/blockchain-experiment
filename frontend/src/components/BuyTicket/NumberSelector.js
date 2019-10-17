@@ -184,11 +184,13 @@ class DrawSelector extends React.PureComponent {
       <>
         <SelectDraw draws={data} onClick={this.onClick} />
         <Ticket
+          hideRandom={false}
           loading={randomLoading}
           numbers={numbers}
           updateNumbers={this.updateNumbers}
           generateRandomNumbers={this.generateRandomNumbers}
         />
+        <h2>Cost: $1.00 AUD - 1 game</h2>
         {error && <Message type="error" message={errorMessage} />}
         {success && (
           <Message

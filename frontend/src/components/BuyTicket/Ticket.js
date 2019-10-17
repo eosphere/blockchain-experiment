@@ -113,7 +113,7 @@ const RandomNumbers = () => {
     <Tooltip title="Autopick my numbers">
       <Button onClick={randomNumbers} className={`${classes.circle} ${classes.random}`}>
         {loading ? (
-          <CircularProgress className={classes.loading} />
+          <CircularProgress size={25} className={classes.loading} />
         ) : (
           <MdStar className={classes.icon} />
         )}
@@ -130,7 +130,7 @@ const NumberSet = ({ hideRandom }) => {
       {numberChoices.map((value, index) => (
         <NumberCircle key={index} number={numbers[index]} />
       ))}
-      {!hideRandom && <RandomNumbers />}
+      {hideRandom && <RandomNumbers />}
       <ClearNumbers />
     </Box>
   );
