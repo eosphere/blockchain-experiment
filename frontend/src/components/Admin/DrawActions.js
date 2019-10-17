@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import CloseDraw from './CloseDraw';
+import SetNumbers from './SetNumbers';
 
 const DrawActions = props => {
   const accountName = useSelector(state => state.currentAccount.account.name);
@@ -10,14 +10,12 @@ const DrawActions = props => {
   const { drawnumber, open, winningnumbers } = draw;
 
   return (
-    <Box display="flex" justifyContent="space-between">
+    <>
       {open ? <CloseDraw wallet={wallet} drawnumber={drawnumber} /> : null}
       {!open && winningnumbers.length === 0 ? (
-        <Button variant="contained" color="primary" size="small">
-          Set numbers
-        </Button>
+        <SetNumbers wallet={wallet} drawnumber={drawnumber} />
       ) : null}
-    </Box>
+    </>
   );
 };
 

@@ -18,8 +18,9 @@ const useStyles = makeStyles(theme => ({
     minWidth: 280
   },
   circle: {
+    minWidth: '0',
     width: '45px',
-    height: '65px',
+    height: '45px',
     borderRadius: '50%',
     boxShadow: 'inset 0 3px 5px 0 rgba(0, 0, 0, 0.2)',
     marginRight: theme.spacing(1),
@@ -121,7 +122,7 @@ const RandomNumbers = () => {
   );
 };
 
-const NumberSet = () => {
+const NumberSet = ({ hideRandom }) => {
   const numberChoices = [...range(1, NUMBER_CHOICE_LIMIT)];
   const { numbers } = useContext(CounterContext);
   return (
@@ -129,7 +130,7 @@ const NumberSet = () => {
       {numberChoices.map((value, index) => (
         <NumberCircle key={index} number={numbers[index]} />
       ))}
-      <RandomNumbers />
+      {!hideRandom && <RandomNumbers />}
       <ClearNumbers />
     </Box>
   );
@@ -147,7 +148,7 @@ const NumberGrid = () => {
   );
 };
 
-const Ticket = ({ loading, numbers, updateNumbers, generateRandomNumbers }) => {
+const Ticket = ({ hideRandom, loading, numbers, updateNumbers, generateRandomNumbers }) => {
   const remove = value => {
     updateNumbers(numbers.filter(numberValue => numberValue !== value));
   };
@@ -161,12 +162,12 @@ const Ticket = ({ loading, numbers, updateNumbers, generateRandomNumbers }) => {
   };
 
   const randomNumbers = () => {
-    generateRandomNumbers();
+    return generateRandomNumbers && generateRandomNumbers();
   };
 
   return (
     <CounterContext.Provider value={{ loading, numbers, remove, removeAll, add, randomNumbers }}>
-      <NumberSet />
+      <NumberSet hideRandom />
       <NumberGrid />
     </CounterContext.Provider>
   );
