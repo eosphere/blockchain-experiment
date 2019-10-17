@@ -41,6 +41,7 @@ namespace BlockChainLambda
                                     purchaser = ticketPurchaser,
                                     drawnumber = drawNumber,
                                     entrynumbers = ticket,
+                                    genreward = true,
                                 }
                             }
                         }
@@ -63,7 +64,7 @@ namespace BlockChainLambda
                 catch (Exception ex)
                 {
                     if (SendLogToConsole)
-                        Console.WriteLine($"{ex.Message}. Ticket {TicketAsString(ticket)}");
+                        Console.WriteLine($"{ex.Message}. Ticket {TicketAsString(ticket)}, Inner Exception {ex.InnerException}");
                 }
                 if (++attempt > MaxAttempts)
                     break;
@@ -95,7 +96,6 @@ namespace BlockChainLambda
 
             return ticket;
         }
-
         private string TicketAsString(int[] ticket)
         {
             string stringTicket = "";

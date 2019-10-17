@@ -2,7 +2,6 @@ using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using EosSharp;
 using EosSharp.Core;
-using EosSharp.Core.Api.v1;
 using EosSharp.Core.Providers;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ using System.Threading.Tasks;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-
 namespace BlockChainLambda
 {
     public class Simulators
@@ -57,7 +55,7 @@ namespace BlockChainLambda
 
                 RunPurchaseTicketSim(eos, drawNo, totalTickets, contract, buyer);
 
-                message = $"Initiated {totalTickets} tickets purchase for draw: {drawNo}, contract: {contract}, buyer: {buyer} @endpoint {httpEndpoint}";
+                message = $"Initiated {totalTickets} tickets purchase for draw: {drawNo}, contract: {contract}, buyer: {buyer} @endpoint {httpEndpoint}, RequestId: {context.AwsRequestId}";
             }  
             
 
@@ -90,10 +88,10 @@ namespace BlockChainLambda
                 contract = req.QueryStringParameters["contract"];
                 buyer = req.QueryStringParameters["buyer"];
 
-                buyTicketAPI = buyTicketAPI.Replace("--drawno--", drawNo.ToString());
-                buyTicketAPI = buyTicketAPI.Replace("--totaltickets--", ticketsPerCall.ToString());
-                buyTicketAPI = buyTicketAPI.Replace("--contract--", contract);
-                buyTicketAPI = buyTicketAPI.Replace("--buyer--", buyer);
+                buyTicketAPI = buyTicketAPI.AddQueryToURL("drawno", drawNo.ToString())
+                                .AddQueryToURL("totaltickets", ticketsPerCall.ToString())
+                                .AddQueryToURL("contract", contract)
+                                .AddQueryToURL("buyer", buyer);
 
                 RunLoadTest(totalCalls, buyTicketAPI);
 
@@ -103,6 +101,9 @@ namespace BlockChainLambda
 
             return new APIGatewayProxyResponse() { StatusCode = 200, Body = message };
         }
+
+       
+
         private void RunPurchaseTicketSim(Eos eos, int drawNumber, int totalTickets, string contract, string buyer)
         {
             DateTime startTime = DateTime.Now;
@@ -126,7 +127,6 @@ namespace BlockChainLambda
             DateTime startTime = DateTime.Now;
             HttpClient httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(apiURL);
-
             List<Task> tasks = new List<Task>();
             
             for (int i = 1; i <= totalCalls; i++)
