@@ -83,14 +83,15 @@ class DrawSelector extends React.PureComponent {
               data: {
                 purchaser: accountName,
                 drawnumber: draw,
-                entrynumbers: numbers
+                entrynumbers: numbers,
+                genreward: true
               }
             }
           ]
         },
         {
           blocksBehind: 3,
-          expireSeconds: 30
+          expireSeconds: 60
         }
       );
       this.setState({ pending: false, success: true, transactionId: response.transaction_id });

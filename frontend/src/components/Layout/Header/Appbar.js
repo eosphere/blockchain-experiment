@@ -1,16 +1,19 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
 import { MdAccountCircle } from 'react-icons/md';
 import { IoMdMoon } from 'react-icons/io';
-import Tooltip from '@material-ui/core/Tooltip';
 import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
-import { MenuItem, Menu } from '@material-ui/core';
+import {
+  MenuItem,
+  Menu,
+  makeStyles,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Tooltip
+} from '@material-ui/core';
 import Balance from './Balance';
 
 const useStyles = makeStyles(theme => ({

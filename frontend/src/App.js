@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import './transit/initTransit.js';
-import AccessContextSubscribe from './transit/AccessContextSubscribe';
-import store from './store';
-import { MainLayout } from './components';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { configureStore } from './store';
+import { MuiThemeProvider, createMuiTheme, CssBaseline } from '@material-ui/core';
 import { darkColors, lightColors, darkTheme, lightTheme } from './theme';
+import AccessContextSubscribe from './transit/AccessContextSubscribe';
+import './transit/initTransit.js';
 import AppRoutes from './AppRoutes';
+import { MainLayout } from './components';
+import { isProduction } from 'utils';
+
+const store = configureStore();
 
 const App = () => {
+  if (isProduction) {
+    window.onbeforeunload = function() {
+      return 'Data will be lost if you leave the page, are you sure?';
+    };
+  }
+
   const recentTheme = localStorage.getItem('theme');
   const useTheme = recentTheme === 'light' ? lightTheme : darkTheme;
   const [theme, setTheme] = useState(useTheme);
@@ -26,11 +34,10 @@ const App = () => {
       }
     });
   };
-
-  const muiTheme = createMuiTheme(theme);
+  const materialUITheme = createMuiTheme(theme);
 
   return (
-    <MuiThemeProvider theme={muiTheme}>
+    <MuiThemeProvider theme={materialUITheme}>
       <CssBaseline />
       <Provider store={store}>
         <AccessContextSubscribe>

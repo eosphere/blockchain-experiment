@@ -2,6 +2,7 @@ import React from 'react';
 import Title from './Title';
 import DrawsTable from './DrawsTable';
 import { TOKEN_SMARTCONTRACT } from 'utils';
+import { OpenDraw } from '../Admin';
 
 class Draws extends React.PureComponent {
   state = {
@@ -33,11 +34,13 @@ class Draws extends React.PureComponent {
 
   render() {
     const { data, loading } = this.state;
+    const { wallet } = this.props;
     if (loading) return null;
     return (
       <>
         <Title>Recent Draws</Title>
-        <DrawsTable rows={data} />
+        <OpenDraw wallet={wallet} />
+        <DrawsTable rows={data} wallet={wallet} />
       </>
     );
   }

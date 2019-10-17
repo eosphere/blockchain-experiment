@@ -1,9 +1,8 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Title from './Title';
 import { TOKEN_SMARTCONTRACT } from 'utils';
+
+import { Typography, Box, CircularProgress } from '@material-ui/core';
 
 class Balance extends React.PureComponent {
   state = {

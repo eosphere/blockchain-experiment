@@ -1,18 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Box from '@material-ui/core/Box';
 import Balance from 'components/Dashboard/Balance';
 import Transactions from 'components/Dashboard/Transactions';
 import Title from 'components/Dashboard/Title';
-import { AdminCard } from 'components/Admin';
 import Draws from 'components/Dashboard/Draws';
 import WAL from 'eos-transit';
+
+import { makeStyles, Grid, Paper, Button, CircularProgress, Box } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -31,20 +27,33 @@ const useStyles = makeStyles(theme => ({
 
 const Welcome = ({ wallet }) => {
   const classes = useStyles();
-  const { accountInfo } = wallet;
+  const {
+    accountInfo: { account_name: accountName }
+  } = wallet;
   let history = useHistory();
+  const dispatch = useDispatch();
 
   const buyTicket = () => {
     history.push('/buy/ticket');
   };
 
+  useEffect(() => {
+    dispatch({ type: 'SET_ACCOUNT', payload: { name: accountName } });
+  }, [accountName, dispatch]);
+
+  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
+
   return (
     <>
-      <Title className={classes.title}>Welcome, {accountInfo.account_name}.</Title>
-      <br />
-      <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
-        Buy a Lottery Ticket
-      </Button>
+      <Title className={classes.title}>Welcome, {accountName}.</Title>
+
+      {!isAdmin && (
+        <Box marginY={2}>
+          <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
+            Buy a Lottery Ticket
+          </Button>
+        </Box>
+      )}
     </>
   );
 };
@@ -85,14 +94,11 @@ const Dashboard = () => {
           </Wrapper>
         </Paper>
       </Grid>
-      {wallet && <AdminCard wallet={wallet} paperStyle={classes.paper} />}
-
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           <Draws wallet={wallet} />
         </Paper>
       </Grid>
-
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}

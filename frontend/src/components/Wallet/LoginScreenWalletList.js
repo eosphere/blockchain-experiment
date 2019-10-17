@@ -1,7 +1,7 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import AccessContextSubscribe from '../../transit/AccessContextSubscribe';
 import { WalletListItem, WalletStateSubscribe } from '../Wallet';
+import { Button } from '@material-ui/core';
 
 class LoginScreenWalletList extends React.Component {
   handleWalletProviderSelect = walletProvider => {

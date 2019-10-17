@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 const Message = ({ type, message }) => {
   const classes = useStyles();
   return (
-    <Box display="flex" className={`${classes.root} ${classes[type]}`}>
+    <Box display="flex" flexWrap="wrap" className={`${classes.root} ${classes[type]}`}>
       {type === 'success' && <MdCheckCircle className={classes.icon} />}
       {type === 'error' && <MdError className={classes.icon} />}
       {message}

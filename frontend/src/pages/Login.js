@@ -1,13 +1,10 @@
 import React from 'react';
 import { Redirect, withRouter } from 'react-router';
 import WAL from 'eos-transit';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import { SvgIcon } from '@material-ui/core';
+import { SvgIcon, makeStyles, Button, CircularProgress } from '@material-ui/core';
 import { ReactComponent as EOSLogo } from 'assets/eos-logo.svg';
 import { ReactComponent as ScatterLogo } from 'assets/scatter-logo.svg';
 import { LoginScreenWalletList } from 'components/Wallet';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles(theme => ({
   paper: {

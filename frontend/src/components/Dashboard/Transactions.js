@@ -1,9 +1,9 @@
 import React from 'react';
 import { TOKEN_SMARTCONTRACT } from 'utils';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Table from './TransactionsTable';
 import Title from './Title';
+
+import { Box, CircularProgress } from '@material-ui/core';
 
 class Transactions extends React.PureComponent {
   state = {
@@ -39,9 +39,9 @@ class Transactions extends React.PureComponent {
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
-      scope: TOKEN_SMARTCONTRACT,
+      scope: '11',
       table: 'tickets',
-      limit: 20,
+      limit: 300,
       reverse: true,
       ...filter
     });
@@ -57,6 +57,7 @@ class Transactions extends React.PureComponent {
         <Table rows={rows} />
       </>
     ) : (
+      // <SelectDraw draws={data} onClick={this.onClick} />
       <Box
         flexGrow="1"
         display="flex"

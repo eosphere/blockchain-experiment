@@ -9,6 +9,8 @@ import {
   TableRow,
   Chip
 } from '@material-ui/core';
+import { DrawActions } from '../Admin';
+import { useSelector } from 'react-redux';
 
 const columns = [
   {
@@ -35,6 +37,11 @@ const columns = [
     label: 'Last Modified Date',
     key: 'last_modified_date',
     order: 4
+  },
+  {
+    label: 'Draw Admin',
+    key: 'actions',
+    order: 5
   }
 ];
 
@@ -75,7 +82,8 @@ const DrawStatus = ({ status }) => {
   return <Chip label={label} variant="outlined" size="small" />;
 };
 
-const renderCell = (key, value) => {
+const renderCell = (key, value, draw, wallet) => {
+  if (key.includes('actions')) return <DrawActions draw={draw} wallet={wallet} />;
   if (key.includes('open')) return <DrawStatus status={value} />;
   if (key.includes('winningnumbers')) return <Numbers numbers={value} />;
   if (key.includes('date'))
@@ -86,19 +94,27 @@ const renderCell = (key, value) => {
   return value;
 };
 
-const TableComponent = ({ rows }) => {
+const ignoreColumn = (isAdmin, key, matchKey) => {
+  return !isAdmin && key === matchKey;
+};
+
+const TableComponent = ({ rows, wallet }) => {
   const classes = useStyles();
+  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
   return (
     <Table size="small">
       <TableHead>
         <TableRow>
           {columns
             .sort((a, b) => a.order - b.order)
-            .map(column => (
-              <TableCell className={classes.cell} key={column.key}>
-                {column.label}
-              </TableCell>
-            ))}
+            .map(column => {
+              if (ignoreColumn(isAdmin, column.key, 'actions')) return null;
+              return (
+                <TableCell className={classes.cell} key={column.key}>
+                  {column.label}
+                </TableCell>
+              );
+            })}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -107,11 +123,14 @@ const TableComponent = ({ rows }) => {
             <TableRow key={row.drawnumber}>
               {columns
                 .sort((a, b) => a.order - b.order)
-                .map(column => (
-                  <TableCell className={classes.cell} key={column.key}>
-                    {renderCell(column.key, row[column.key])}
-                  </TableCell>
-                ))}
+                .map(column => {
+                  if (ignoreColumn(isAdmin, column.key, 'actions')) return null;
+                  return (
+                    <TableCell className={classes.cell} key={column.key}>
+                      {renderCell(column.key, row[column.key], row, wallet)}
+                    </TableCell>
+                  );
+                })}
             </TableRow>
           ))}
       </TableBody>

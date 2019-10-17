@@ -6,14 +6,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Box,
   CircularProgress
 } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import Message from '../Message';
 
-const OpenDrawDialog = ({
+const CloseDrawDialog = ({
   success,
   error,
   errorMessage,
@@ -21,23 +20,26 @@ const OpenDrawDialog = ({
   open = false,
   toggleDialog,
   onSubmit,
-  redirect
+  redirect,
+  drawnumber
 }) => {
   return (
     <Dialog
       open={open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{success ? 'Success' : 'Confirmation'}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {success ? 'Draw Closed Success' : 'Draw Close Confirmaton'}
+      </DialogTitle>
       <DialogContent>
         {!success && (
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to open a new draw?
+            Are you sure you want to close <strong>Draw No. {drawnumber}</strong>?
           </DialogContentText>
         )}
         {success && (
           <DialogContentText id="alert-dialog-description">
-            <Message type="success" message={`New draw successfully created.`} />
+            <Message type="success" message={`Draw No. ${drawnumber} closed successfully.`} />
           </DialogContentText>
         )}
         {error && <Message type="error" message={errorMessage} />}
@@ -73,7 +75,7 @@ const OpenDrawDialog = ({
   );
 };
 
-class OpenDraw extends React.PureComponent {
+class CloseDraw extends React.PureComponent {
   constructor(props) {
     super(props);
     this.initialState = {
@@ -102,12 +104,12 @@ class OpenDraw extends React.PureComponent {
   onSubmit = () => {
     this.setState(
       prevState => ({ error: false, errorMessage: '', loading: !prevState.loading }),
-      () => this.openDraw()
+      () => this.closeDraw()
     );
   };
 
-  async openDraw() {
-    const { wallet } = this.props;
+  async closeDraw() {
+    const { wallet, drawnumber } = this.props;
     const {
       accountInfo: { account_name: accountName }
     } = wallet;
@@ -117,14 +119,14 @@ class OpenDraw extends React.PureComponent {
           actions: [
             {
               account: TOKEN_SMARTCONTRACT,
-              name: 'createdraw',
+              name: 'closedraw',
               authorization: [
                 {
                   actor: accountName,
                   permission: 'active'
                 }
               ],
-              data: {}
+              data: { drawnumber: drawnumber }
             }
           ]
         },
@@ -146,12 +148,13 @@ class OpenDraw extends React.PureComponent {
 
   render() {
     const { open, loading, error, errorMessage, success } = this.state;
+    const { drawnumber } = this.props;
     return (
-      <Box>
-        <Button variant="contained" color="primary" onClick={this.toggleDialog}>
-          Create New Draw
+      <>
+        <Button variant="contained" color="primary" size="small" onClick={this.toggleDialog}>
+          Close Draw
         </Button>
-        <OpenDrawDialog
+        <CloseDrawDialog
           error={error}
           errorMessage={errorMessage}
           success={success}
@@ -160,20 +163,17 @@ class OpenDraw extends React.PureComponent {
           loading={loading}
           toggleDialog={this.toggleDialog}
           onSubmit={this.onSubmit}
+          drawnumber={drawnumber}
         />
-      </Box>
+      </>
     );
   }
 }
 
-const OpenDrawContainer = ({ wallet }) => {
+const CloseDrawContainer = ({ wallet, drawnumber }) => {
   const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
   if (!isAdmin) return null;
-  return (
-    <Box display="flex" justifyContent="flex-end" marginBottom={1}>
-      <OpenDraw wallet={wallet} />
-    </Box>
-  );
+  return <CloseDraw wallet={wallet} drawnumber={drawnumber} />;
 };
 
-export default OpenDrawContainer;
+export default CloseDrawContainer;
