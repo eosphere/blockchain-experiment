@@ -41,7 +41,7 @@ namespace BlockChainLambda
                                     purchaser = ticketPurchaser,
                                     drawnumber = drawNumber,
                                     entrynumbers = ticket,
-                                    genreward = true,
+                                    genreward = false,
                                 }
                             }
                         }
