@@ -1,4 +1,4 @@
-###Dependencies
+### Dependencies
 1.  Install .Net Core 2.1
 ```
 [.Net Core 2.1](https://dotnet.microsoft.com/download/dotnet-core/2.1 ".Net Core 2.1")
@@ -8,14 +8,14 @@
 dotnet tool install -g Amazon.Lambda.Tools
 ```
 
-###Build
+### Build
 In shell, go the project folder (having BlockChainLambda.csproj file), execute below command:
 ```
 dotnet lambda package
 ```
 This will compile and create a zip file in bin\Release\netcoreapp2.1 folder.
 
-###Deploy in AWS
+### Deploy in AWS
 ```
 Create Lambda "BuyTicket".
 Set Function Code
@@ -38,8 +38,7 @@ Set the appropriate roles.
 Set the Lambda to be invoked from API Gateway. Name the API as "BuyTicketLoadTest-API"
 Goto to the staging variables of "BuyTicketLoadTest-API", add a variable "BuyTicketAPI", set its value to the "BuyTicket-API" url.
 ```
-###Run
-Load Test
+### Run Load Test
 ```
 Invoke "BuyTicket-API" url with query parameters: 
 	drawno
@@ -48,7 +47,7 @@ Invoke "BuyTicket-API" url with query parameters:
 	contract
 	buyer
 ```
-Single API Test
+### Single API Test
 ```
 Invoke "BuyTicket" url with query parameters: 
 	drawno

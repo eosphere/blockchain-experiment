@@ -116,13 +116,19 @@ async function getWinNumbers () {
 }
 
 async function startProcess () {
+	var startTime = Date.now();
+	console.log("**Start Time: " + Date(startTime) + "**");
+
 	var isDrawOpen = await getWinNumbers ();
 	
 	if(isDrawOpen)
 		console.log ("Draw is not yet closed. Process aborted!!");
 	else	
 		await getTickets ();
+	
+	var endTime = Date.now();
+	console.log("**End Time: " + Date(endTime) + "**");
+	console.log("**Total time taken : " + (endTime - startTime) + " ms**");
 }
-
 
 startProcess();
