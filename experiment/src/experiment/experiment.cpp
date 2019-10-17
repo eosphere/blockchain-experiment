@@ -364,7 +364,7 @@ void experiment::claim( const uint64_t& serial_no, const uint64_t& drawnumber ){
    check (prize.amount > 0, "Ooops, no price for tier" + std::to_string(t_itr->winningtier));
 
    //transfer winning amount
-   string memo { "Pay dividends for ticket: " + std::to_string(serial_no) };
+   string memo { "Paid " + prize.to_string() + " for ticket: " + std::to_string(serial_no) };
    action(
       permission_level{ get_self(), "active"_n },
       c.deposit_token_contract, "transfer"_n,
