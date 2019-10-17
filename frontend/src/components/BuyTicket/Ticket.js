@@ -6,7 +6,7 @@ import { MdDelete, MdStar } from 'react-icons/md';
 import { range, NUMBER_CHOICE_LIMIT, TOTAL_GAME_NUMBERS } from 'utils';
 
 const { createContext, useContext } = React;
-const CounterContext = createContext();
+const TicketContext = createContext();
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -71,7 +71,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NumberCircle = ({ number }) => {
-  const { remove } = useContext(CounterContext);
+  const { remove } = useContext(TicketContext);
   const classes = useStyles();
   return (
     <Button
@@ -84,7 +84,7 @@ const NumberCircle = ({ number }) => {
 
 const NumberSquare = ({ number }) => {
   const classes = useStyles();
-  const { remove, add, numbers } = useContext(CounterContext);
+  const { remove, add, numbers } = useContext(TicketContext);
   const isActive = numbers.includes(number);
   const onClick = isActive ? remove.bind(null, number) : add.bind(null, number);
   return (
@@ -96,7 +96,7 @@ const NumberSquare = ({ number }) => {
 
 const ClearNumbers = () => {
   const classes = useStyles();
-  const { removeAll } = useContext(CounterContext);
+  const { removeAll } = useContext(TicketContext);
   return (
     <Tooltip title="Clear all Numbers">
       <Button onClick={removeAll} className={`${classes.circle} ${classes.remove}`}>
@@ -108,7 +108,7 @@ const ClearNumbers = () => {
 
 const RandomNumbers = () => {
   const classes = useStyles();
-  const { loading, randomNumbers } = useContext(CounterContext);
+  const { loading, randomNumbers } = useContext(TicketContext);
   return (
     <Tooltip title="Autopick my numbers">
       <Button onClick={randomNumbers} className={`${classes.circle} ${classes.random}`}>
@@ -124,7 +124,7 @@ const RandomNumbers = () => {
 
 const NumberSet = ({ hideRandom }) => {
   const numberChoices = [...range(1, NUMBER_CHOICE_LIMIT)];
-  const { numbers } = useContext(CounterContext);
+  const { numbers } = useContext(TicketContext);
   return (
     <Box marginY={1}>
       {numberChoices.map((value, index) => (
@@ -166,10 +166,10 @@ const Ticket = ({ hideRandom, loading, numbers, updateNumbers, generateRandomNum
   };
 
   return (
-    <CounterContext.Provider value={{ loading, numbers, remove, removeAll, add, randomNumbers }}>
+    <TicketContext.Provider value={{ loading, numbers, remove, removeAll, add, randomNumbers }}>
       <NumberSet hideRandom />
       <NumberGrid />
-    </CounterContext.Provider>
+    </TicketContext.Provider>
   );
 };
 
