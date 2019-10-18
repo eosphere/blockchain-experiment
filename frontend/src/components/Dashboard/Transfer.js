@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Button,
+  Box,
   Dialog,
   DialogActions,
   DialogContent,
@@ -8,12 +9,11 @@ import {
   DialogTitle,
   CircularProgress
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
-import { TOKEN_SMARTCONTRACT } from 'utils';
+import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
 import Message from '../Message';
-import { Ticket } from '../BuyTicket';
+import TransferForm from './TransferForm';
 
-const SetNumbersDialog = ({
+const TransferDialog = ({
   success,
   error,
   errorMessage,
@@ -22,10 +22,10 @@ const SetNumbersDialog = ({
   toggleDialog,
   onSubmit,
   redirect,
-  drawnumber,
   transactionId,
-  numbers,
-  children
+  children,
+  values,
+  title
 }) => {
   return (
     <Dialog
@@ -33,7 +33,7 @@ const SetNumbersDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">
-        {success ? 'Winning numbers Confirmed' : `Enter Winning Numbers for Draw no. ${drawnumber}`}
+        {success ? `${title} Success` : `${title} Tokens`}
       </DialogTitle>
       <DialogContent>
         {!success && children}
@@ -41,7 +41,9 @@ const SetNumbersDialog = ({
           <DialogContentText id="alert-dialog-description">
             <Message
               type="success"
-              message={`Winning numbers (${numbers.toString()}) for Draw No. ${drawnumber} set. `}
+              message={`${title} of ${parseFloat(values.quantity).toFixed(2)} ${
+                values.currency
+              } to ${values.to} was successful.`}
               transactionId={transactionId}
             />
           </DialogContentText>
@@ -60,9 +62,8 @@ const SetNumbersDialog = ({
             onClick={onSubmit}
             color="primary"
             variant="contained"
-            disabled={numbers.length !== 6}
             autoFocus>
-            {loading ? <CircularProgress color="inherit" /> : 'Submit'}
+            {loading ? <CircularProgress color="inherit" /> : 'Confirm'}
           </Button>
         )}
         {success && (
@@ -80,33 +81,37 @@ const SetNumbersDialog = ({
   );
 };
 
-class SetNumbers extends React.PureComponent {
+class Transfer extends React.PureComponent {
   constructor(props) {
     super(props);
+    const { type, accountName } = this.props;
+    this.accountName = accountName;
+
+    const from = type === 'deposit' ? accountName : TOKEN_SMARTCONTRACT;
+    const to = type === 'deposit' ? TOKEN_SMARTCONTRACT : accountName;
+
     this.initialState = {
-      numbers: [],
       open: false,
       loading: false,
       error: false,
       errorMessage: '',
       success: false,
-      transactionId: ''
+      transactionId: '',
+      values: {
+        from,
+        to,
+        quantity: '',
+        currency: 'AUD',
+        memo: ''
+      }
     };
+    this.state = this.initialState;
   }
-
-  state = {
-    ...this.initialState
-  };
 
   toggleDialog = () => {
     this.setState(prevState => ({
-      numbers: [],
-      open: !prevState.open,
-      loading: false,
-      error: false,
-      errorMessage: '',
-      success: false,
-      transactionId: ''
+      ...this.initialState,
+      open: !prevState.open
     }));
   };
 
@@ -118,34 +123,36 @@ class SetNumbers extends React.PureComponent {
         errorMessage: '',
         loading: !prevState.loading
       }),
-      () => this.setNumbers()
+      () => this.Transfer()
     );
   };
 
-  updateNumbers = numbers => {
-    this.setState({ numbers, error: false, errorMessage: '' });
+  handleChange = values => {
+    this.setState({ values }, () => console.log(this.state));
   };
 
-  async setNumbers() {
-    const { wallet, drawnumber } = this.props;
-    const { numbers: winningnumbers } = this.state;
+  async Transfer() {
+    const { wallet, accountName } = this.props;
     const {
-      accountInfo: { account_name: accountName }
-    } = wallet;
+      values: { from, to, quantity, currency, memo }
+    } = this.state;
+
     try {
+      const total = `${parseFloat(quantity).toFixed(2)} ${currency}`;
+      const data = { from, to, quantity: total, memo };
       const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
-              account: TOKEN_SMARTCONTRACT,
-              name: 'setwinnums',
+              account: TOKEN_WALLET_CONTRACT,
+              name: 'transfer',
               authorization: [
                 {
                   actor: accountName,
                   permission: 'active'
                 }
               ],
-              data: { drawnumber, winningnumbers }
+              data
             }
           ]
         },
@@ -171,14 +178,15 @@ class SetNumbers extends React.PureComponent {
   };
 
   render() {
-    const { open, loading, error, errorMessage, success, transactionId, numbers = [] } = this.state;
-    const { drawnumber } = this.props;
+    const { open, loading, error, errorMessage, success, transactionId, values } = this.state;
+    const { type } = this.props;
+    const title = type.charAt(0).toUpperCase() + type.slice(1);
     return (
-      <>
+      <Box display="inline" marginX="5px">
         <Button variant="contained" color="primary" size="small" onClick={this.toggleDialog}>
-          Set numbers
+          {title}
         </Button>
-        <SetNumbersDialog
+        <TransferDialog
           error={error}
           errorMessage={errorMessage}
           success={success}
@@ -187,20 +195,14 @@ class SetNumbers extends React.PureComponent {
           loading={loading}
           toggleDialog={this.toggleDialog}
           onSubmit={this.onSubmit}
-          drawnumber={drawnumber}
           transactionId={transactionId}
-          numbers={numbers}>
-          <Ticket showRandom={false} numbers={numbers} updateNumbers={this.updateNumbers} />
-        </SetNumbersDialog>
-      </>
+          values={values}
+          title={title}>
+          <TransferForm {...values} values={values} handleChange={this.handleChange} />
+        </TransferDialog>
+      </Box>
     );
   }
 }
 
-const SetNumbersContainer = ({ wallet, drawnumber }) => {
-  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
-  if (!isAdmin) return null;
-  return <SetNumbers wallet={wallet} drawnumber={drawnumber} />;
-};
-
-export default SetNumbersContainer;
+export default Transfer;

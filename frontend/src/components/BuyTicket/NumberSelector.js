@@ -184,7 +184,7 @@ class DrawSelector extends React.PureComponent {
       <>
         <SelectDraw draws={data} onClick={this.onClick} />
         <Ticket
-          hideRandom={false}
+          showRandom={true}
           loading={randomLoading}
           numbers={numbers}
           updateNumbers={this.updateNumbers}

@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   fixedHeight: {
-    height: 200
+    minHeight: 300
   },
   title: {
     textTransform: 'capitalize'
@@ -48,7 +48,7 @@ const Welcome = ({ wallet }) => {
       <Title className={classes.title}>Welcome, {accountName}.</Title>
 
       {!isAdmin && (
-        <Box marginY={2}>
+        <Box display="flex" marginY={2}>
           <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
             Buy a Lottery Ticket
           </Button>

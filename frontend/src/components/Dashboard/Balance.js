@@ -1,45 +1,102 @@
 import React from 'react';
+import { Typography, Box, CircularProgress, makeStyles } from '@material-ui/core';
+import Transfer from './Transfer';
 import Title from './Title';
-import { TOKEN_SMARTCONTRACT } from 'utils';
+import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
+import Message from '../Message';
 
-import { Typography, Box, CircularProgress } from '@material-ui/core';
+const useStyles = makeStyles(theme => ({
+  icon: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
+  }
+}));
+
+const LottCoin = () => {
+  const classes = useStyles();
+  return <img alt="Lott Coin" className={classes.icon} width="45px" src="/lott-logo.png" />;
+};
 
 class Balance extends React.PureComponent {
   state = {
     loading: true,
-    data: {}
+    funds: '',
+    tokenBalance: '',
+    error: false,
+    errorMessage: '',
+    accountName: ''
   };
 
   async componentDidMount() {
-    const { wallet } = this.props;
-    const name = wallet.accountInfo.account_name;
-    const response = await wallet.eosApi.rpc.get_table_rows({
-      json: true,
-      code: TOKEN_SMARTCONTRACT,
-      scope: name,
-      table: 'balances'
-    });
-    const { rows } = response;
-    const data = rows[0] || rows;
-    this.setState({ data, loading: false });
+    const {
+      wallet,
+      wallet: {
+        accountInfo: { account_name: accountName }
+      }
+    } = this.props;
+
+    this.setState({ accountName });
+
+    try {
+      const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
+        json: true,
+        code: TOKEN_SMARTCONTRACT,
+        scope: accountName,
+        table: 'balances'
+      });
+      const { rows: accounts } = await wallet.eosApi.rpc.get_table_rows({
+        json: true,
+        code: TOKEN_WALLET_CONTRACT,
+        scope: accountName,
+        table: 'accounts'
+      });
+      const { funds } = balances.find(row => row.funds.includes('AUD'));
+      const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
+      this.setState({ funds, tokenBalance, loading: false });
+    } catch (error) {
+      const { message } = error;
+      this.setState({
+        loading: false,
+        error: true,
+        errorMessage: `${message}. Please try again.`
+      });
+    }
   }
 
   render() {
-    const { data, loading } = this.state;
-    const { funds, token_contract: tokenContract } = data;
+    const { loading, tokenBalance, funds, error, errorMessage, accountName } = this.state;
+    const { wallet } = this.props;
     return (
       <>
         {!loading ? (
           <>
-            <Title>Total Balance</Title>
-            <Typography component="p" variant="h4">
-              <strong>
-                {funds && funds.includes('AUD') && '$'}
-                {funds || `$0`}
-              </strong>
+            <Title>Total Balances</Title>
+            {error && <Message type="error" message={errorMessage} />}
+            <Typography component="span" variant="h4">
+              <strong>{`Ł ` + tokenBalance || `0 LOTT (Ł)`}</strong>
+              <LottCoin />
+              {/* <Exchange /> */}
             </Typography>
             <Typography component="p" variant="body1">
-              Smart Contract: {tokenContract}
+              Smart Contract: {TOKEN_WALLET_CONTRACT}
+            </Typography>
+            <Typography component="span" variant="h4">
+              <strong>
+                {funds && funds.includes('AUD') && '$ '}
+                {funds || `$0`}
+              </strong>
+              <Transfer type="deposit" accountName={accountName} wallet={wallet} />
+              <Transfer type="withdraw" accountName={accountName} wallet={wallet} />
+            </Typography>
+            <Typography component="p" variant="body1">
+              Smart Contract: {TOKEN_SMARTCONTRACT}
+            </Typography>
+            <hr />
+            <Typography component="p" variant="body1">
+              <strong>$1.00 AUD = 30 LOTT Tokens</strong>
+            </Typography>
+            <Typography component="p" variant="body1">
+              <strong>1 Lottery Ticket = 10 LOTT Tokens</strong>
             </Typography>
           </>
         ) : (

@@ -5,6 +5,17 @@ export function toNumber(input) {
   return Number(chunks[0]);
 }
 
+export const CURRENCY_LIST = [
+  {
+    value: 'LOTT',
+    label: 'LOTT (Ł)'
+  },
+  {
+    value: 'AUD',
+    label: 'AUD ($)'
+  }
+];
+
 export const TOKEN_SMARTCONTRACT = process.env.REACT_APP_TOKEN_SMARTCONTRACT;
 
 export const NETWORK_HOST = process.env.REACT_APP_NETWORK_HOST;
@@ -12,6 +23,8 @@ export const NETWORK_HOST = process.env.REACT_APP_NETWORK_HOST;
 export const SYSTEM_DOMAIN = process.env.REACT_APP_SYSTEM_DOMAIN;
 
 export const CORE_SYMBOL = process.env.REACT_APP_CORE_SYMBOL;
+
+export const TOKEN_WALLET_CONTRACT = 'experimtoken';
 
 export const NUMBER_CHOICE_LIMIT = 6;
 

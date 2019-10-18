@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Button,
+  Box,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,9 +12,8 @@ import {
 import { useSelector } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import Message from '../Message';
-import { Ticket } from '../BuyTicket';
 
-const SetNumbersDialog = ({
+const ExchangeDialog = ({
   success,
   error,
   errorMessage,
@@ -23,9 +23,7 @@ const SetNumbersDialog = ({
   onSubmit,
   redirect,
   drawnumber,
-  transactionId,
-  numbers,
-  children
+  transactionId
 }) => {
   return (
     <Dialog
@@ -33,15 +31,19 @@ const SetNumbersDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">
-        {success ? 'Winning numbers Confirmed' : `Enter Winning Numbers for Draw no. ${drawnumber}`}
+        {success ? 'Draw Closed Success' : 'Draw Close Confirmaton'}
       </DialogTitle>
       <DialogContent>
-        {!success && children}
+        {!success && (
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to close <strong>Draw No. {drawnumber}</strong>?
+          </DialogContentText>
+        )}
         {success && (
           <DialogContentText id="alert-dialog-description">
             <Message
               type="success"
-              message={`Winning numbers (${numbers.toString()}) for Draw No. ${drawnumber} set. `}
+              message={`Draw No. ${drawnumber} closed successfully. `}
               transactionId={transactionId}
             />
           </DialogContentText>
@@ -60,9 +62,8 @@ const SetNumbersDialog = ({
             onClick={onSubmit}
             color="primary"
             variant="contained"
-            disabled={numbers.length !== 6}
             autoFocus>
-            {loading ? <CircularProgress color="inherit" /> : 'Submit'}
+            {loading ? <CircularProgress color="inherit" /> : 'Yes'}
           </Button>
         )}
         {success && (
@@ -80,11 +81,10 @@ const SetNumbersDialog = ({
   );
 };
 
-class SetNumbers extends React.PureComponent {
+class Exchange extends React.PureComponent {
   constructor(props) {
     super(props);
     this.initialState = {
-      numbers: [],
       open: false,
       loading: false,
       error: false,
@@ -100,7 +100,6 @@ class SetNumbers extends React.PureComponent {
 
   toggleDialog = () => {
     this.setState(prevState => ({
-      numbers: [],
       open: !prevState.open,
       loading: false,
       error: false,
@@ -118,43 +117,38 @@ class SetNumbers extends React.PureComponent {
         errorMessage: '',
         loading: !prevState.loading
       }),
-      () => this.setNumbers()
+      () => this.exchange()
     );
   };
 
-  updateNumbers = numbers => {
-    this.setState({ numbers, error: false, errorMessage: '' });
-  };
-
-  async setNumbers() {
+  async exchange() {
     const { wallet, drawnumber } = this.props;
-    const { numbers: winningnumbers } = this.state;
     const {
       accountInfo: { account_name: accountName }
     } = wallet;
     try {
-      const { transaction_id: transactionId } = await wallet.eosApi.transact(
-        {
-          actions: [
-            {
-              account: TOKEN_SMARTCONTRACT,
-              name: 'setwinnums',
-              authorization: [
-                {
-                  actor: accountName,
-                  permission: 'active'
-                }
-              ],
-              data: { drawnumber, winningnumbers }
-            }
-          ]
-        },
-        {
-          blocksBehind: 3,
-          expireSeconds: 60
-        }
-      );
-      this.setState({ loading: false, success: true, transactionId });
+      // const { transaction_id: transactionId } = await wallet.eosApi.transact(
+      //   {
+      //     actions: [
+      //       {
+      //         account: TOKEN_SMARTCONTRACT,
+      //         name: 'closedraw',
+      //         authorization: [
+      //           {
+      //             actor: accountName,
+      //             permission: 'active'
+      //           }
+      //         ],
+      //         data: { drawnumber: drawnumber }
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     blocksBehind: 3,
+      //     expireSeconds: 60
+      //   }
+      // );
+      this.setState({ loading: false, success: true, transactionId: 'x' });
     } catch (error) {
       const { message } = error;
       this.setState({
@@ -171,14 +165,14 @@ class SetNumbers extends React.PureComponent {
   };
 
   render() {
-    const { open, loading, error, errorMessage, success, transactionId, numbers = [] } = this.state;
+    const { open, loading, error, errorMessage, success, transactionId } = this.state;
     const { drawnumber } = this.props;
     return (
-      <>
+      <Box display="inline">
         <Button variant="contained" color="primary" size="small" onClick={this.toggleDialog}>
-          Set numbers
+          Exchange Tokens
         </Button>
-        <SetNumbersDialog
+        <ExchangeDialog
           error={error}
           errorMessage={errorMessage}
           success={success}
@@ -189,18 +183,10 @@ class SetNumbers extends React.PureComponent {
           onSubmit={this.onSubmit}
           drawnumber={drawnumber}
           transactionId={transactionId}
-          numbers={numbers}>
-          <Ticket showRandom={false} numbers={numbers} updateNumbers={this.updateNumbers} />
-        </SetNumbersDialog>
-      </>
+        />
+      </Box>
     );
   }
 }
 
-const SetNumbersContainer = ({ wallet, drawnumber }) => {
-  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
-  if (!isAdmin) return null;
-  return <SetNumbers wallet={wallet} drawnumber={drawnumber} />;
-};
-
-export default SetNumbersContainer;
+export default Exchange;

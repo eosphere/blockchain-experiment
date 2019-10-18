@@ -122,15 +122,15 @@ const RandomNumbers = () => {
   );
 };
 
-const NumberSet = ({ hideRandom }) => {
+const NumberSet = () => {
   const numberChoices = [...range(1, NUMBER_CHOICE_LIMIT)];
-  const { numbers } = useContext(TicketContext);
+  const { numbers, showRandom } = useContext(TicketContext);
   return (
     <Box marginY={1}>
       {numberChoices.map((value, index) => (
         <NumberCircle key={index} number={numbers[index]} />
       ))}
-      {hideRandom && <RandomNumbers />}
+      {showRandom && <RandomNumbers />}
       <ClearNumbers />
     </Box>
   );
@@ -148,7 +148,7 @@ const NumberGrid = () => {
   );
 };
 
-const Ticket = ({ hideRandom, loading, numbers, updateNumbers, generateRandomNumbers }) => {
+const Ticket = ({ showRandom, loading, numbers, updateNumbers, generateRandomNumbers }) => {
   const remove = value => {
     updateNumbers(numbers.filter(numberValue => numberValue !== value));
   };
@@ -166,8 +166,9 @@ const Ticket = ({ hideRandom, loading, numbers, updateNumbers, generateRandomNum
   };
 
   return (
-    <TicketContext.Provider value={{ loading, numbers, remove, removeAll, add, randomNumbers }}>
-      <NumberSet hideRandom />
+    <TicketContext.Provider
+      value={{ showRandom, loading, numbers, remove, removeAll, add, randomNumbers }}>
+      <NumberSet />
       <NumberGrid />
     </TicketContext.Provider>
   );
