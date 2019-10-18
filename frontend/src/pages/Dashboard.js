@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
 import Balance from 'components/Dashboard/Balance';
+import BankBalance from 'components/Dashboard/BankBalance';
 import Transactions from 'components/Dashboard/Transactions';
 import Title from 'components/Dashboard/Title';
 import Draws from 'components/Dashboard/Draws';
@@ -80,14 +81,21 @@ const Dashboard = () => {
   const wallet = WAL.accessContext.getActiveWallets()[0];
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={6} lg={6}>
+      <Grid item xs={12} md={4} lg={4}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
             <Welcome wallet={wallet} />
           </Wrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6} lg={6}>
+      <Grid item xs={12} md={4} lg={4}>
+        <Paper className={fixedHeightPaper}>
+          <Wrapper wallet={wallet}>
+            <BankBalance wallet={wallet} />
+          </Wrapper>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={4} lg={4}>
         <Paper className={fixedHeightPaper}>
           <Wrapper wallet={wallet}>
             <Balance wallet={wallet} />
