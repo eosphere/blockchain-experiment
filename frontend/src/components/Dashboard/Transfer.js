@@ -84,11 +84,11 @@ const TransferDialog = ({
 class Transfer extends React.PureComponent {
   constructor(props) {
     super(props);
-    const { type, accountName } = this.props;
+    const { type, accountName, currency } = this.props;
     this.accountName = accountName;
 
-    const from = type === 'deposit' ? accountName : TOKEN_SMARTCONTRACT;
-    const to = type === 'deposit' ? TOKEN_SMARTCONTRACT : accountName;
+    const from = type === 'deposit' || type === 'claim' ? accountName : TOKEN_SMARTCONTRACT;
+    const to = type === 'deposit' || type === 'claim' ? TOKEN_SMARTCONTRACT : accountName;
 
     this.initialState = {
       open: false,
@@ -101,7 +101,7 @@ class Transfer extends React.PureComponent {
         from,
         to,
         quantity: '',
-        currency: 'AUD',
+        currency,
         memo: ''
       }
     };
@@ -128,24 +128,34 @@ class Transfer extends React.PureComponent {
   };
 
   handleChange = values => {
-    this.setState({ values }, () => console.log(this.state));
+    this.setState({ values });
   };
 
   async Transfer() {
-    const { wallet, accountName } = this.props;
+    const { wallet, accountName, type } = this.props;
     const {
       values: { from, to, quantity, currency, memo }
     } = this.state;
 
     try {
+      const actionName = type === 'withdraw' ? 'withdraw' : 'transfer';
+      const account = type === 'withdraw' ? TOKEN_SMARTCONTRACT : TOKEN_WALLET_CONTRACT;
       const total = `${parseFloat(quantity).toFixed(2)} ${currency}`;
-      const data = { from, to, quantity: total, memo };
+      const data =
+        type !== 'withdraw' || type !== 'claim'
+          ? { from, to, quantity: total, memo }
+          : {
+              account: to,
+              quantity: total
+            };
+
+      console.log(data);
       const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
-              account: TOKEN_WALLET_CONTRACT,
-              name: 'transfer',
+              account,
+              name: actionName,
               authorization: [
                 {
                   actor: accountName,
@@ -198,7 +208,7 @@ class Transfer extends React.PureComponent {
           transactionId={transactionId}
           values={values}
           title={title}>
-          <TransferForm {...values} values={values} handleChange={this.handleChange} />
+          <TransferForm {...values} type={type} values={values} handleChange={this.handleChange} />
         </TransferDialog>
       </Box>
     );

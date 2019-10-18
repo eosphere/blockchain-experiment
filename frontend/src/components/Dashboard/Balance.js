@@ -70,26 +70,20 @@ class Balance extends React.PureComponent {
       <>
         {!loading ? (
           <>
-            <Title>Total Balances</Title>
+            <Title>Lottery Account Balances</Title>
             {error && <Message type="error" message={errorMessage} />}
             <Typography component="span" variant="h4">
               <strong>{`Ł ` + tokenBalance || `0 LOTT (Ł)`}</strong>
               <LottCoin />
-              {/* <Exchange /> */}
-            </Typography>
-            <Typography component="p" variant="body1">
-              Smart Contract: {TOKEN_WALLET_CONTRACT}
+              <Transfer type="claim" currency="LOTT" accountName={accountName} wallet={wallet} />
             </Typography>
             <Typography component="span" variant="h4">
               <strong>
                 {funds && funds.includes('AUD') && '$ '}
                 {funds || `$0`}
               </strong>
-              <Transfer type="deposit" accountName={accountName} wallet={wallet} />
-              <Transfer type="withdraw" accountName={accountName} wallet={wallet} />
-            </Typography>
-            <Typography component="p" variant="body1">
-              Smart Contract: {TOKEN_SMARTCONTRACT}
+              {/* <Transfer type="deposit" currency="AUD" accountName={accountName} wallet={wallet} /> */}
+              {/* <Transfer type="withdraw" currency="AUD" accountName={accountName} wallet={wallet} /> */}
             </Typography>
             <hr />
             <Typography component="p" variant="body1">
