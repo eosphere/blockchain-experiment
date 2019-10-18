@@ -24,11 +24,6 @@ CONTRACT experiment : public contract {
    public:
       using contract::contract;
 
-      class serinal_tier {
-         uint64_t                serialno                   ;
-         uint8_t                 winningtier                ;
-      };
-
       struct [[ eosio::table, eosio::contract("experiment") ]] config
       {
          // a general purpose settings map
@@ -128,9 +123,6 @@ CONTRACT experiment : public contract {
       ACTION cancelticket( const name& purchaser, const uint64_t& serial_no, const uint64_t& drawnumber );
       
       ACTION processwin(const uint64_t& serial_no, const uint64_t& drawnumber );
-      
-      //update ticket by winning number
-      //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
       
       //update ticket status and pay
       ACTION claim( const uint64_t& serial_no, const uint64_t& drawnumber );
