@@ -1,9 +1,5 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { MdAccountCircle } from 'react-icons/md';
-import { IoMdMoon } from 'react-icons/io';
-import WAL from 'eos-transit';
-import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import {
   MenuItem,
   Menu,
@@ -12,8 +8,13 @@ import {
   Toolbar,
   Typography,
   IconButton,
-  Tooltip
+  Tooltip,
+  Button,
+  useTheme
 } from '@material-ui/core';
+import { MdExpandMore, MdAccountCircle, MdBrightness4, MdBrightness7 } from 'react-icons/md';
+import WAL from 'eos-transit';
+import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import Balance from './Balance';
 
 const useStyles = makeStyles(theme => ({
@@ -33,17 +34,27 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   name: {
+    marginLeft: theme.spacing(1),
     fontWeight: 'bold',
     textTransform: 'Capitalize'
   },
   dialog: {
     minWidth: '300px',
     minHeight: '150px'
+  },
+  downArrow: {
+    width: theme.spacing(3),
+    height: theme.spacing(3)
+  },
+  icon: {
+    width: theme.spacing(3),
+    height: theme.spacing(3)
   }
 }));
 
 const HeaderAppBar = props => {
   const classes = useStyles();
+  const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -85,31 +96,33 @@ const HeaderAppBar = props => {
             <Typography variant="h6" className={classes.title}>
               The Lott
             </Typography>
-            <Tooltip title="Toggle Dark Mode" aria-label="theme">
+            <Tooltip title="Toggle light/dark theme" aria-label="theme">
               <IconButton className={classes.themeButton} color="inherit" onClick={toggleTheme}>
-                <IoMdMoon />
+                {theme.palette.type === 'light' ? <MdBrightness4 /> : <MdBrightness7 />}
               </IconButton>
             </Tooltip>
             {isLoggedIn && (
               <>
                 {name && <Balance wallet={wallet} />}
-                <Typography variant="body1" className={classes.name}>
-                  {name}
-                </Typography>
-                <Tooltip title="Account Menu" aria-label="account">
-                  <IconButton
-                    aria-label="account of current user"
-                    aria-controls="menu-appbar"
-                    aria-haspopup="true"
-                    onClick={handleMenu}
+                <Tooltip title="Account Menu" enterDelay={300}>
+                  <Button
                     color="inherit"
-                    className={classes.menuButton}>
-                    <MdAccountCircle />
-                  </IconButton>
+                    aria-owns="account-menu"
+                    aria-haspopup="true"
+                    aria-label="account-menu"
+                    onClick={handleMenu}
+                    data-ga-event-category="AppBar"
+                    data-ga-event-action="language">
+                    <MdAccountCircle className={classes.icon} />
+                    <span className={classes.name}>{name}</span>
+                    <MdExpandMore className={classes.downArrow} />
+                  </Button>
                 </Tooltip>
                 <Menu
                   id="menu-appbar"
                   anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
                   anchorOrigin={{
                     vertical: 'top',
                     horizontal: 'right'
@@ -118,9 +131,8 @@ const HeaderAppBar = props => {
                   transformOrigin={{
                     vertical: 'top',
                     horizontal: 'right'
-                  }}
-                  open={open}
-                  onClose={handleClose}>
+                  }}>
+                  <MenuItem>My Account</MenuItem>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </>
