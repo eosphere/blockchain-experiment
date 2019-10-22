@@ -44,9 +44,10 @@ class Transactions extends React.PureComponent {
     const { rows: drawRows } = drawResponse;
     const draws = drawRows.filter(draw => draw.open === 1);
     const { drawnumber: drawNumber } = draws[0] || '';
-    this.setState({ draws, currentDraw: drawNumber }, () => {
-      this.fetchTransactions();
-    });
+    this.mounted &&
+      this.setState({ draws, currentDraw: drawNumber }, () => {
+        this.fetchTransactions();
+      });
   }
 
   async fetchTransactions() {
@@ -85,11 +86,12 @@ class Transactions extends React.PureComponent {
   }
 
   onClick = value => {
-    this.setState({ currentDraw: value, transactionsLoading: true }, () => {
-      setTimeout(() => {
-        this.fetchTransactions();
-      }, 300);
-    });
+    this.mounted &&
+      this.setState({ currentDraw: value, transactionsLoading: true }, () => {
+        setTimeout(() => {
+          this.fetchTransactions();
+        }, 300);
+      });
   };
 
   render() {
