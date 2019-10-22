@@ -7,8 +7,7 @@ import { setBalance } from 'store/account';
 
 class BankBalance extends React.PureComponent {
   state = {
-    loading: true,
-    funds: ''
+    loading: true
   };
 
   async componentDidMount() {
@@ -27,7 +26,7 @@ class BankBalance extends React.PureComponent {
         table: 'accounts'
       });
       const { balance } = balances.find(row => row.balance.includes('AUD'));
-      this.setState({ funds: balance, loading: false }, () => {
+      this.setState({ loading: false }, () => {
         setBalance(balance, 'bank');
       });
     } catch (error) {
@@ -38,7 +37,8 @@ class BankBalance extends React.PureComponent {
   }
 
   render() {
-    const { loading, funds } = this.state;
+    const { loading } = this.state;
+    const { bankBalance } = this.props;
     return (
       <>
         {!loading ? (
@@ -46,8 +46,8 @@ class BankBalance extends React.PureComponent {
             <Title>External Wallet Balance</Title>
             <Typography component="span" variant="h5">
               <strong>
-                {funds && funds.includes('AUD') && '$ '}
-                {funds || `$ 0 AUD`}
+                {bankBalance && bankBalance.includes('AUD') && '$ '}
+                {bankBalance || `$ 0 AUD`}
               </strong>
             </Typography>
           </>
@@ -66,7 +66,9 @@ class BankBalance extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  bankBalance: state.currentAccount.balances.bank
+});
 
 const actions = {
   setBalance
