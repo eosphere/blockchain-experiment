@@ -9,12 +9,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column'
-  },
-  fixedHeight: {
-    height: 200
-  },
-  title: {
-    textTransform: 'capitalize'
   }
 }));
 

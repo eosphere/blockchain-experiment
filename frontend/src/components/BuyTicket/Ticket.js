@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { makeStyles, Button, Box, Tooltip, CircularProgress } from '@material-ui/core';
 import { purple, grey } from '@material-ui/core/colors';
 
 import { MdDelete, MdStar } from 'react-icons/md';
 import { range, NUMBER_CHOICE_LIMIT, TOTAL_GAME_NUMBERS } from 'utils';
 
-const { createContext, useContext } = React;
-const CounterContext = createContext();
+const TicketContext = createContext();
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,8 +17,9 @@ const useStyles = makeStyles(theme => ({
     minWidth: 280
   },
   circle: {
+    minWidth: '0',
     width: '45px',
-    height: '65px',
+    height: '45px',
     borderRadius: '50%',
     boxShadow: 'inset 0 3px 5px 0 rgba(0, 0, 0, 0.2)',
     marginRight: theme.spacing(1),
@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   loading: {
-    color: '#fff'
+    color: 'white'
   },
   active: {
     color: 'white',
@@ -70,7 +70,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NumberCircle = ({ number }) => {
-  const { remove } = useContext(CounterContext);
+  const { remove } = useContext(TicketContext);
   const classes = useStyles();
   return (
     <Button
@@ -83,7 +83,7 @@ const NumberCircle = ({ number }) => {
 
 const NumberSquare = ({ number }) => {
   const classes = useStyles();
-  const { remove, add, numbers } = useContext(CounterContext);
+  const { remove, add, numbers } = useContext(TicketContext);
   const isActive = numbers.includes(number);
   const onClick = isActive ? remove.bind(null, number) : add.bind(null, number);
   return (
@@ -95,7 +95,7 @@ const NumberSquare = ({ number }) => {
 
 const ClearNumbers = () => {
   const classes = useStyles();
-  const { removeAll } = useContext(CounterContext);
+  const { removeAll } = useContext(TicketContext);
   return (
     <Tooltip title="Clear all Numbers">
       <Button onClick={removeAll} className={`${classes.circle} ${classes.remove}`}>
@@ -107,12 +107,12 @@ const ClearNumbers = () => {
 
 const RandomNumbers = () => {
   const classes = useStyles();
-  const { loading, randomNumbers } = useContext(CounterContext);
+  const { loading, randomNumbers } = useContext(TicketContext);
   return (
     <Tooltip title="Autopick my numbers">
       <Button onClick={randomNumbers} className={`${classes.circle} ${classes.random}`}>
         {loading ? (
-          <CircularProgress className={classes.loading} />
+          <CircularProgress size={25} className={classes.loading} />
         ) : (
           <MdStar className={classes.icon} />
         )}
@@ -123,13 +123,13 @@ const RandomNumbers = () => {
 
 const NumberSet = () => {
   const numberChoices = [...range(1, NUMBER_CHOICE_LIMIT)];
-  const { numbers } = useContext(CounterContext);
+  const { numbers, showRandom } = useContext(TicketContext);
   return (
     <Box marginY={1}>
       {numberChoices.map((value, index) => (
         <NumberCircle key={index} number={numbers[index]} />
       ))}
-      <RandomNumbers />
+      {showRandom && <RandomNumbers />}
       <ClearNumbers />
     </Box>
   );
@@ -147,7 +147,7 @@ const NumberGrid = () => {
   );
 };
 
-const Ticket = ({ loading, numbers, updateNumbers, generateRandomNumbers }) => {
+const Ticket = ({ showRandom, loading, numbers, updateNumbers, generateRandomNumbers }) => {
   const remove = value => {
     updateNumbers(numbers.filter(numberValue => numberValue !== value));
   };
@@ -161,14 +161,15 @@ const Ticket = ({ loading, numbers, updateNumbers, generateRandomNumbers }) => {
   };
 
   const randomNumbers = () => {
-    generateRandomNumbers();
+    return generateRandomNumbers && generateRandomNumbers();
   };
 
   return (
-    <CounterContext.Provider value={{ loading, numbers, remove, removeAll, add, randomNumbers }}>
+    <TicketContext.Provider
+      value={{ showRandom, loading, numbers, remove, removeAll, add, randomNumbers }}>
       <NumberSet />
       <NumberGrid />
-    </CounterContext.Provider>
+    </TicketContext.Provider>
   );
 };
 

@@ -16,7 +16,9 @@
     "eos-transit-scatter-provider": "^4.0.1",
     "eosjs": "^20.0.0",
     "husky": "^3.0.8",
+    "immer": "^4.0.1",
     "lint-staged": "^9.4.1",
+    "moment": "^2.24.0",
     "prettier": "^1.18.2",
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
@@ -25,7 +27,10 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
     "redux": "^4.0.4",
-    "redux-saga": "^1.1.1"
+    "redux-devtools-extension": "^2.13.8",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0"
   },
   "devDependencies": {
     "customize-cra": "^0.8.0",

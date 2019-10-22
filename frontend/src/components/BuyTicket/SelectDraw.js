@@ -1,9 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import { makeStyles, InputLabel, MenuItem, FormControl, Select } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -19,7 +15,7 @@ const useStyles = makeStyles(theme => ({
 const SelectDraw = props => {
   const classes = useStyles();
   const [values, setValues] = React.useState({
-    draw: ''
+    draw: props.drawNumber
   });
   const { draws } = props;
   const handleChange = event => {

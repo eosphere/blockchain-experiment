@@ -1,12 +1,9 @@
 import React from 'react';
 import { Icon } from '../../pages/Login';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Snackbar from '@material-ui/core/Snackbar';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
 import clsx from 'clsx';
 import { MdError as ErrorIcon } from 'react-icons/md';
+
+import { Button, makeStyles, CircularProgress, Snackbar, SnackbarContent } from '@material-ui/core';
 
 const useStyles1 = makeStyles(theme => ({
   error: {
@@ -46,7 +43,7 @@ function MySnackbarContentWrapper(props) {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    color: '#fff',
+    color: 'white',
     backgroundColor: '#20b6e8',
     '&:hover': {
       backgroundColor: '#1496c1'
@@ -55,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     minWidth: '310px'
   },
   progress: {
-    color: '#fff'
+    color: 'white'
   }
 }));
 

@@ -6,20 +6,20 @@ import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import SelectDraw from './SelectDraw';
 import Ticket from './Ticket';
-import Message from '../Message';
+import { Message } from 'components/Shared';
 
 const NO_DRAW_ERROR = 'No draw selected. Please select a draw and your lucky numbers.';
 const NO_NUMBERS_ERROR = 'Please select your 6 lucky numbers.';
 
 const ColorCircularProgress = withStyles({
   root: {
-    color: '#fff'
+    color: 'white'
   }
 })(CircularProgress);
 
 const SubmitButton = withStyles({
   root: {
-    color: '#fff',
+    color: 'white',
     backgroundColor: '#ba68c8',
     minHeight: '56px',
     '&:hover': {
@@ -38,7 +38,8 @@ class DrawSelector extends React.PureComponent {
     loading: true,
     randomLoading: false,
     draw: '',
-    numbers: []
+    numbers: [],
+    transactionId: ''
   };
 
   async componentDidMount() {
@@ -57,7 +58,7 @@ class DrawSelector extends React.PureComponent {
   }
 
   onClick = value => {
-    this.setState({ draw: value, error: false, errorMessage: '' });
+    this.setState({ draw: value, error: false, errorMessage: '', transactionId: '' });
   };
 
   async onTransaction() {
@@ -68,7 +69,7 @@ class DrawSelector extends React.PureComponent {
     const { draw, numbers } = this.state;
     const { account_name: accountName } = accountInfo;
     try {
-      const response = await wallet.eosApi.transact(
+      const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
             {
@@ -83,30 +84,48 @@ class DrawSelector extends React.PureComponent {
               data: {
                 purchaser: accountName,
                 drawnumber: draw,
-                entrynumbers: numbers
+                entrynumbers: numbers,
+                genreward: true
               }
             }
           ]
         },
         {
           blocksBehind: 3,
-          expireSeconds: 30
+          expireSeconds: 60
         }
       );
-      this.setState({ pending: false, success: true, transactionId: response.transaction_id });
+      this.setState({ pending: false, success: true, transactionId });
     } catch (error) {
       const { message } = error;
-      this.setState({ pending: false, error: true, errorMessage: `${message}. Please try again.` });
+      this.setState({
+        transactionId: '',
+        pending: false,
+        error: true,
+        errorMessage: `${message}. Please try again.`
+      });
     }
   }
 
   setError = errorMessage => {
-    this.setState({ pending: false, error: true, errorMessage, randomLoading: false });
+    this.setState({
+      transactionId: '',
+      pending: false,
+      error: true,
+      errorMessage,
+      randomLoading: false
+    });
   };
 
   onSubmit = () => {
     const { draw, numbers } = this.state;
-    this.setState({ pending: true, success: false, error: false, errorMessage: '' });
+    this.setState({
+      transactionId: '',
+      pending: true,
+      success: false,
+      error: false,
+      errorMessage: ''
+    });
     if (!draw) {
       this.setError(NO_DRAW_ERROR);
     } else if (numbers.length !== 6) {
@@ -165,16 +184,19 @@ class DrawSelector extends React.PureComponent {
       <>
         <SelectDraw draws={data} onClick={this.onClick} />
         <Ticket
+          showRandom={true}
           loading={randomLoading}
           numbers={numbers}
           updateNumbers={this.updateNumbers}
           generateRandomNumbers={this.generateRandomNumbers}
         />
+        <h2>Cost: $1.00 AUD - 1 game</h2>
         {error && <Message type="error" message={errorMessage} />}
         {success && (
           <Message
             type="success"
-            message={`Transaction Successful. Transaction Id: ${transactionId}`}
+            message={`Transaction Successful.`}
+            transactionId={transactionId}
           />
         )}
         <SubmitButton
@@ -204,15 +226,16 @@ class NumberSelector extends React.PureComponent {
         {() => (
           <>
             <DrawSelector wallet={wallet} />
-            <Button
-              variant="contained"
-              color="default"
-              size="large"
-              type="submit"
-              style={{ marginTop: '8px' }}
-              onClick={this.handleHome}>
-              Back to Home
-            </Button>
+            <Box marginTop="8px">
+              <Button
+                variant="contained"
+                color="default"
+                size="large"
+                type="submit"
+                onClick={this.handleHome}>
+                Back to Home
+              </Button>
+            </Box>
           </>
         )}
       </AccessContextSubscribe>
