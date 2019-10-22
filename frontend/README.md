@@ -8,10 +8,11 @@ https://eostabcorp.now.sh
 
 Languages / Framework / Dependenies used:
 
-- Create-React-App for build configuration
-- React for Frontend UI Layer
-- Material UI for Component Framework
-- EOS-Transit and EOS-Transit-Scatter for Blockchain wallet authentication and API interactions
+- [Create React App](https://github.com/facebook/create-react-app) for build configuration
+- [React](https://reactjs.org/) for Frontend UI Layer
+- [Material UI](https://material-ui.com/) for Component Framework
+- [Redux](https://redux.js.org/) for State management
+- [EOS-Transit and EOS-Transit-Scatter](https://github.com/eosnewyork/eos-transit) for EOSIO Blockchain wallet authentication and API interactions
 
 ### Prerequisites
 
