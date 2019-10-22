@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import Table from './TransactionsTable';
 import Title from './Title';
@@ -22,8 +23,7 @@ class Transactions extends React.PureComponent {
     transactionsLoading: true,
     rows: [],
     draws: [],
-    currentDraw: '',
-    customer: false
+    currentDraw: ''
   };
   mounted = false;
 
@@ -52,11 +52,7 @@ class Transactions extends React.PureComponent {
 
   async fetchTransactions() {
     const { currentDraw } = this.state;
-    const { wallet } = this.props;
-    const {
-      accountInfo: { account_name: accountName }
-    } = wallet;
-
+    const { wallet, accountName } = this.props;
     let filter;
     if (accountName !== 'numberselect') {
       filter = {
@@ -95,8 +91,9 @@ class Transactions extends React.PureComponent {
   };
 
   render() {
-    const { draws, rows, loading, transactionsLoading, customer, currentDraw } = this.state;
-    const { wallet } = this.props;
+    const { draws, rows, loading, transactionsLoading, currentDraw } = this.state;
+    const { wallet, isTicketBuyer } = this.props;
+
     if (loading) {
       return (
         <Box
@@ -111,7 +108,7 @@ class Transactions extends React.PureComponent {
     }
     return (
       <>
-        <Title>{customer && `Your `}Recent Purchases</Title>
+        <Title>{isTicketBuyer && `Your `}Recent Purchases</Title>
         <SelectDraw draws={draws} drawNumber={currentDraw} onClick={this.onClick} />
         {transactionsLoading ? <LoadingSpinner /> : <Table rows={rows} wallet={wallet} />}
       </>
@@ -119,4 +116,12 @@ class Transactions extends React.PureComponent {
   }
 }
 
-export default Transactions;
+const mapStateToProps = state => {
+  const accountName = state.currentAccount.account.name;
+  return {
+    accountName,
+    isTicketBuyer: accountName.includes('ticketbuyer')
+  };
+};
+
+export default connect(mapStateToProps)(Transactions);
