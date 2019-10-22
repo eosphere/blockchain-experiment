@@ -31,7 +31,7 @@ const Welcome = () => {
   const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch({ type: SET_ACCOUNT, payload: { name: accountName } });
+    dispatch({ type: SET_ACCOUNT, payload: accountName });
   }, [accountName, dispatch]);
 
   let history = useHistory();

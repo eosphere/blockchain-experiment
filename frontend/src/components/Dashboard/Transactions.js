@@ -39,7 +39,7 @@ class Transactions extends React.PureComponent {
     const response = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
-      scope: '29',
+      scope: '33',
       table: 'tickets',
       limit: 20,
       reverse: true,

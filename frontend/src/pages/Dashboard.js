@@ -29,21 +29,21 @@ const Dashboard = () => {
   const { wallet } = useContext(WalletContext);
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={2} lg={3}>
+      <Grid item xs={12} md={3}>
         <Paper className={fixedHeightPaper}>
           <LoadingWrapper wallet={wallet}>
             <Welcome />
           </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={3} lg={3}>
+      <Grid item xs={12} md={3}>
         <Paper className={fixedHeightPaper}>
           <LoadingWrapper wallet={wallet}>
             <BankBalance wallet={wallet} />
           </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6} lg={6}>
+      <Grid item xs={12} md={6}>
         <Paper className={fixedHeightPaper}>
           <LoadingWrapper wallet={wallet}>
             <Balance wallet={wallet} />

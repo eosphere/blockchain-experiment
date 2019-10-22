@@ -14,8 +14,9 @@ import {
 import { MdExpandMore, MdAccountCircle, MdBrightness4, MdBrightness7 } from 'react-icons/md';
 import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
-import Balance from './Balance';
-import BankBalance from './BankBalance';
+import Balances from './Balances';
+import { useSelector, useDispatch } from 'react-redux';
+import { LOGOUT } from 'store/actions';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -52,10 +53,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const menuOriginStyle = {
+  vertical: 'top',
+  horizontal: 'right'
+};
+
 const HeaderAppBar = props => {
   const classes = useStyles();
   const theme = useTheme();
-
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -70,22 +76,14 @@ const HeaderAppBar = props => {
   const handleLogout = () => {
     handleClose();
     const wallet = WAL.accessContext.getActiveWallets()[0];
+    dispatch({ type: LOGOUT });
     wallet.terminate().then(() => {
       localStorage.removeItem('loggedIn');
     });
   };
 
-  const isLoggedIn = WAL.accessContext.getActiveWallets().length > 0;
   const { toggleTheme } = props;
-
-  let name;
-  let wallet;
-  if (isLoggedIn) {
-    wallet = WAL.accessContext.getActiveWallets()[0];
-    if (wallet.accountInfo) {
-      name = wallet.accountInfo.account_name;
-    }
-  }
+  const accountName = useSelector(state => state.currentAccount.account.name);
 
   return (
     <AccessContextSubscribe>
@@ -100,10 +98,9 @@ const HeaderAppBar = props => {
                 {theme.palette.type === 'light' ? <MdBrightness4 /> : <MdBrightness7 />}
               </IconButton>
             </Tooltip>
-            {isLoggedIn && (
+            {accountName && (
               <>
-                {name && <BankBalance wallet={wallet} />}
-                {name && <Balance wallet={wallet} />}
+                <Balances />
                 <Tooltip title="Account Menu" enterDelay={300}>
                   <Button
                     color="inherit"
@@ -114,7 +111,7 @@ const HeaderAppBar = props => {
                     data-ga-event-category="AppBar"
                     data-ga-event-action="language">
                     <MdAccountCircle className={classes.icon} />
-                    <span className={classes.name}>{name}</span>
+                    <span className={classes.name}>{accountName}</span>
                     <MdExpandMore className={classes.downArrow} />
                   </Button>
                 </Tooltip>
@@ -123,15 +120,9 @@ const HeaderAppBar = props => {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={handleClose}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
+                  anchorOrigin={menuOriginStyle}
                   keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}>
+                  transformOrigin={menuOriginStyle}>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </>

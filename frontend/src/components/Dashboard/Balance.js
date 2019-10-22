@@ -1,8 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Typography, Box, CircularProgress, makeStyles } from '@material-ui/core';
 import Transfer from './Transfer';
 import Title from './Title';
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
+import { SET_REWARD_BALANCE, SET_WALLET_BALANCE } from 'store/actions';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -11,9 +13,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LottCoin = () => {
+export const LottCoin = ({ width = '45px', noMargin = false }) => {
   const classes = useStyles();
-  return <img alt="Lott Coin" className={classes.icon} width="45px" src="/lott-logo.png" />;
+  const className = !noMargin ? classes.icon : '';
+  return <img alt="Lott Coin" className={className} width={width} src="/lott-logo.png" />;
 };
 
 class Balance extends React.PureComponent {
@@ -29,7 +32,8 @@ class Balance extends React.PureComponent {
       wallet,
       wallet: {
         accountInfo: { account_name: accountName }
-      }
+      },
+      dispatch
     } = this.props;
     this.setState({ accountName });
     try {
@@ -47,12 +51,21 @@ class Balance extends React.PureComponent {
       });
       const { funds } = balances.find(row => row.funds.includes('AUD'));
       const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
-      this.setState({ funds, tokenBalance, loading: false });
-    } catch (error) {
-      this.setState({
-        loading: false,
-        tokenBalance: '0'
+      this.setState({ funds, tokenBalance, loading: false }, () => {
+        dispatch({ type: SET_REWARD_BALANCE, payload: tokenBalance });
+        dispatch({ type: SET_WALLET_BALANCE, payload: funds });
       });
+    } catch (error) {
+      this.setState(
+        {
+          loading: false,
+          tokenBalance: '0'
+        },
+        () => {
+          dispatch({ type: SET_REWARD_BALANCE, payload: '0 LOTT' });
+          dispatch({ type: SET_WALLET_BALANCE, payload: '0 AUD' });
+        }
+      );
     }
   }
 
@@ -99,4 +112,4 @@ class Balance extends React.PureComponent {
   }
 }
 
-export default Balance;
+export default connect()(Balance);

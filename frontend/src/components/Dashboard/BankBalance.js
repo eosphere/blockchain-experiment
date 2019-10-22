@@ -1,7 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Typography, Box, CircularProgress } from '@material-ui/core';
 import Title from './Title';
 import { TOKEN_WALLET_CONTRACT } from 'utils';
+import { SET_BANK_BALANCE } from 'store/actions';
 
 class BankBalance extends React.PureComponent {
   state = {
@@ -14,7 +16,8 @@ class BankBalance extends React.PureComponent {
       wallet,
       wallet: {
         accountInfo: { account_name: accountName }
-      }
+      },
+      dispatch
     } = this.props;
     try {
       const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
@@ -24,7 +27,9 @@ class BankBalance extends React.PureComponent {
         table: 'accounts'
       });
       const { balance } = balances.find(row => row.balance.includes('AUD'));
-      this.setState({ funds: balance, loading: false });
+      this.setState({ funds: balance, loading: false }, () => {
+        dispatch({ type: SET_BANK_BALANCE, payload: balance });
+      });
     } catch (error) {
       this.setState({
         loading: false
@@ -38,7 +43,7 @@ class BankBalance extends React.PureComponent {
       <>
         {!loading ? (
           <>
-            <Title>Bank Balances</Title>
+            <Title>External Wallet Balance</Title>
             <Typography component="span" variant="h4">
               <strong>
                 {funds && funds.includes('AUD') && '$ '}
@@ -61,4 +66,4 @@ class BankBalance extends React.PureComponent {
   }
 }
 
-export default BankBalance;
+export default connect()(BankBalance);

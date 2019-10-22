@@ -1,2 +1,6 @@
 export const SET_ACCOUNT = 'SET_ACCOUNT';
 export const REFRESH = 'REFRESH';
+export const SET_BANK_BALANCE = 'SET_BANK_BALANCE';
+export const SET_REWARD_BALANCE = 'SET_REWARD_BALANCE';
+export const SET_WALLET_BALANCE = 'SET_WALLET_BALANCE';
+export const LOGOUT = 'LOGOUT';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, makeStyles } from '@material-ui/core';
-import { Appbar } from './Header';
+import { Appbar } from './Appbar';
 import Footer from './Footer';
 
 const useStyles = makeStyles(theme => ({

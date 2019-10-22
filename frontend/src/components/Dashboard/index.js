@@ -1,4 +1,4 @@
-export { default as Balance } from './Balance';
+export { default as Balance, LottCoin } from './Balance';
 export { default as BankBalance } from './BankBalance';
 export { default as Transactions } from './Transactions';
 export { default as Draws } from './Draws';
