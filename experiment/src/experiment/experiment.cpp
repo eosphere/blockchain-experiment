@@ -63,7 +63,7 @@ void experiment::closedraw (const uint64_t& drawnumber) {
    });
 }
 
-void experiment::createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers) {
+void experiment::createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers, const bool& genreward) {
 
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
@@ -103,7 +103,7 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
    });
    
    // add ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    t_t.emplace (get_self(), [&](auto &t) {
       t.serialno        = t_t.available_primary_key();
       t.purchaser       = purchaser;
@@ -111,6 +111,18 @@ void experiment::createticket (const name& purchaser, const uint64_t& drawnumber
       t.drawnumber      = drawnumber;
       t.price           = ticket_cost;
    });
+
+   //generate reward token to user
+   if (genreward) {
+      string memo { "Thanks for playing" };
+      asset lott = REWARD_ASSET;
+      //print ("Reward lott = " + lott.to_string());
+      action (
+         permission_level( get_self(), "active"_n),
+         c.deposit_token_contract, "transfer"_n,
+         std::make_tuple(get_self(), purchaser, lott, memo)
+      ).send();
+   }
 }
 
 void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winningnumbers) {
@@ -125,6 +137,7 @@ void experiment::setwinnums (const uint64_t& drawnumber, const set<uint8_t> winn
    draw_table d_t (get_self(), get_self().value);
    auto d_itr = d_t.find (drawnumber);
    check (d_itr != d_t.end(), "Draw number not found: " + std::to_string(drawnumber));
+   check (!d_itr->open, "Must close draw first.");
 
    // require that set size is 6 and they are between 1 and 45 inclusive
    print ("Winning number size: ", std::to_string(winningnumbers.size()), "\n");
@@ -149,29 +162,37 @@ void experiment::deposit ( const name& from, const name& to, const asset& quanti
    // ensure that the symbol and token contract match acceptable configuration
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
-   check (quantity.symbol == c.deposit_symbol, "Only deposits of configured symbol are allowed. You sent: " + quantity.to_string());
+   asset final_amount = quantity;
+   if (from != c.deposit_token_contract) {
+      if (quantity.symbol != c.deposit_symbol) {
+         //convert to AUD
+         final_amount = asset(quantity.amount / 30, c.deposit_symbol);
+      }
+
+      //check (quantity.symbol == c.deposit_symbol, "Only deposits of configured symbol are allowed. You sent: " + quantity.to_string());
+   }
    check (token_contract == c.deposit_token_contract, "Only deposits from configured token contract are allowed. You sent from: " 
       + token_contract.to_string() + "; Configured contract: " + c.deposit_token_contract.to_string());
 
    balance_table balances(get_self(), from.value);
    asset new_balance;
-   auto it = balances.find(quantity.symbol.code().raw());
+   auto it = balances.find(final_amount.symbol.code().raw());
    if(it != balances.end()) {
       check (it->token_contract == token_contract, "Transfer does not match existing token contract.");
       balances.modify(it, get_self(), [&](auto& bal){
-         bal.funds += quantity;
+         bal.funds += final_amount;
          new_balance = bal.funds;
       });
    } else {
       balances.emplace(get_self(), [&](auto& bal){
-         bal.funds = quantity;
+         bal.funds = final_amount;
          bal.token_contract  = token_contract;
-         new_balance = quantity;
+         new_balance = final_amount;
       });
    }
 
    print ("\n");
-   print(name{from}, " deposited:       ", quantity, "\n");
+   print(name{from}, " deposited:       ", final_amount, "\n");
    print(name{from}, " funds available: ", new_balance);
    print ("\n");
 }
@@ -211,7 +232,7 @@ void experiment::withdraw (const name& account, const asset& quantity) {
    .send();
 }
 
-void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
+void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no, const uint64_t& drawnumber){
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
    
@@ -220,7 +241,7 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
    check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
 
    //check ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
    check (t_itr->ticket_status == PURCHASED, "Ticket cannot be cancelled if cancelled or claimed.");
@@ -274,7 +295,7 @@ void experiment::cancelticket(const name& purchaser, const uint64_t& serial_no){
 //    //update ticket table, only can be perfomed by numberSelector account
 // }
 
-void experiment::processwin(const uint64_t& serial_no){
+void experiment::processwin(const uint64_t& serial_no, const uint64_t& drawnumber){
    config_table      config_s (get_self(), get_self().value);
    config c = config_s.get_or_create (get_self(), config());
    
@@ -283,10 +304,10 @@ void experiment::processwin(const uint64_t& serial_no){
    check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
 
    //check ticket
-   ticket_table t_t (get_self(), get_self().value);
+   ticket_table t_t (get_self(), drawnumber);
    auto t_itr = t_t.find (serial_no);
    check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
-   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Clamied ");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
    
    //get draw based on ticket drawno check draw open,check winnings set
    draw_table d_t (get_self(), get_self().value);
@@ -309,14 +330,129 @@ void experiment::processwin(const uint64_t& serial_no){
   
 }
 
-void experiment::claim(const uint64_t& serial_no){
+void experiment::claim( const uint64_t& serial_no, const uint64_t& drawnumber ){
+
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   // ensure not paused
+   uint8_t paused = c.settings[name("active")];
+   check (c.settings["active"_n] == 1, "Contract is not active. Exiting.");
+
+   //check ticket
+   ticket_table t_t (get_self(), drawnumber);
+   auto t_itr = t_t.find (serial_no);
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == PURCHASED, "Ticket cannot be claimed");
+   
    //validate the winning number
+   if (t_itr->winningtier == 0) {
+      processwin (serial_no, drawnumber);
+   }
+   ticket_table tt_t (get_self(), drawnumber);
+   t_itr = tt_t.find (serial_no);
+   check (t_itr->winningtier>0, "Sorry, your are not win.");
+
    //retrieve dividents from winning_dividens table
+   dividend_table d_t (get_self(), get_self().value);
+   //TODO: To simplfy the dividends handling, use fixed dividends at this moment
+   //auto d_itr = d_t.find(t_itr->drawnumber);
+   auto d_itr = d_t.find(0); 
+   check (d_itr != d_t.end(), "Ooops, no winning dividends for this draw");
+   auto divmap = d_itr->dividends;
+   asset prize = divmap.at(t_itr->winningtier);
+   check (prize.amount > 0, "Ooops, no price for tier" + std::to_string(t_itr->winningtier));
+
    //transfer winning amount
+   string memo { "Paid " + prize.to_string() + " for ticket: " + std::to_string(serial_no) };
+   action(
+      permission_level{ get_self(), "active"_n },
+      c.deposit_token_contract, "transfer"_n,
+      std::make_tuple(get_self(), t_itr->purchaser, prize, memo))
+   .send();
+
    //update ticket status to claimed
+   tt_t.modify(t_itr, get_self(), [&](auto& row){
+      row.ticket_status = CLAIMED;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
 }
 
-void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends){
-   // account is number selector
-   // draw is closed
+void experiment::updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   // ONLY the number_selector can set the winning numbers
+   require_auth (c.number_selector);
+
+   //check draw, must be closed
+   draw_table r_t (get_self(), get_self().value);
+   auto r_itr = r_t.find(drawnumber);
+   check (!r_itr->open, "Draw is not closed yet!!");
+
+   //valid asset
+   for (auto aDiv : dividends) {
+      asset quantity = aDiv.second;
+      check( quantity.is_valid(), "invalid dividends" );
+      check( quantity.amount > 0, "Dividends must be positive value" );
+      check( quantity.symbol == c.deposit_symbol, "symbol precision mismatch" );
+   }
+   
+   // set the numbers in the draw table record
+   dividend_table d_t (get_self(), get_self().value);
+   auto d_itr = d_t.find (drawnumber);
+   if (d_itr == d_t.end()) {
+      //create
+      d_t.emplace(get_self(), [&](auto& row){
+         row.drawnumber = drawnumber;
+         row.dividends = dividends;
+      });
+   } else {
+      //update
+      d_t.modify(d_itr, get_self(), [&](auto& row){
+         row.dividends = dividends;
+      });
+   }
+   
+}
+
+
+//Erase all the table data expect for balance table
+void experiment::reset(int limit, const uint64_t& drawnumber){
+    require_auth (get_self());
+
+    ticket_table t_t (get_self(), drawnumber);
+    auto tt_itr = t_t.begin ();
+
+    for(int i =0; i<= limit;i++){
+      if(tt_itr ==  t_t.end ())
+      break;
+      tt_itr = t_t.erase(tt_itr);
+    }
+
+    dividend_table d_t (get_self(), get_self().value);
+    auto d_itr = d_t.begin ();
+
+    for (int i = 0; i<=limit; i++) {
+      if (d_itr == d_t.end())
+         break;
+      d_itr = d_t.erase(d_itr); 
+    }
+}
+
+//update the winning tier for specific ticket number (serial no)
+void experiment::updatewint(const uint64_t& serial_no,uint8_t win_tier, const uint64_t& drawnumber){
+   config_table      config_s (get_self(), get_self().value);
+   config c = config_s.get_or_create (get_self(), config());
+
+   ticket_table t_t (get_self(), drawnumber);
+   auto t_itr = t_t.find (serial_no);
+   
+   check (t_itr != t_t.end(), "Ticket " + std::to_string(serial_no) + " not found");
+   check (t_itr->ticket_status == 0, "Ticket looks like Cancelled / Claimed ");
+    t_t.modify(t_itr, get_self(), [&](auto& row){
+      row.winningtier = win_tier;
+      row.last_modified_date = current_block_time().to_time_point();
+   });
+
 }

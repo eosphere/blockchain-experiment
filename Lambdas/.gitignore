@@ -1,0 +1,54 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+*.pdb
+*.cache
+obj/
+
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+bin/
+
+# Debug files
+*.dSYM/
+*.su
+
+# Visual Studio files
+.vs/
+*.csproj.user
+
+# log files
+logs/
+
+# vscode
+.vscode/
+
+# Publish folders
+**/Publish/
+
+# Packages
+*.nupkg

@@ -57,6 +57,7 @@ const Dashboard = () => {
           </LoadingWrapper>
         </Paper>
       </Grid>
+
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           <LoadingWrapper wallet={wallet}>

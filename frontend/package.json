@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.5.0",
+    "dayjs": "^1.8.16",
     "eos-transit": "^4.0.1",
     "eos-transit-scatter-provider": "^4.0.1",
     "eosjs": "^20.0.0",

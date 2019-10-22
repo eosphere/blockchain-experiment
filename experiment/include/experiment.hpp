@@ -18,13 +18,11 @@ CONTRACT experiment : public contract {
          CLAIMED = 2
       };
 
+
+      const asset REWARD_ASSET = asset(1000.00, symbol("LOTT",2));
+
    public:
       using contract::contract;
-
-      class serinal_tier {
-         uint64_t                serialno                   ;
-         uint8_t                 winningtier                ;
-      };
 
       struct [[ eosio::table, eosio::contract("experiment") ]] config
       {
@@ -97,9 +95,10 @@ CONTRACT experiment : public contract {
       // table to maintain dividendCANCELLED
       struct [[ eosio::table, eosio::contract("experiment") ]] dividend
       {
-         uint64_t                      drawnumber           ;
+         uint64_t                      drawnumber          ;
          // winningtier and dividend map
-         std::map<uint8_t, double>     dividneds             ;
+         std::map<uint8_t, asset>     dividends            ;
+         uint64_t primary_key() const { return drawnumber; }
       };
       typedef multi_index<"dividends"_n, dividend> dividend_table;
 
@@ -111,7 +110,7 @@ CONTRACT experiment : public contract {
       
       ACTION createdraw ();
       ACTION closedraw ( const uint64_t& drawnumber );
-      ACTION createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers);
+      ACTION createticket (const name& purchaser, const uint64_t& drawnumber, const set<uint8_t> entrynumbers, const bool& genreward);
       ACTION setwinnums (const uint64_t& drawnumber, const set<uint8_t> winningnumbers);
 
       // deposit handler -- this triggers whenever the contract receives tokens
@@ -121,15 +120,19 @@ CONTRACT experiment : public contract {
       ACTION withdraw ( const name& account, const asset& quantity );
 
       //update ticket status from ticket table, refund
-      ACTION cancelticket( const name& purchaser, const uint64_t& serial_no );
+      ACTION cancelticket( const name& purchaser, const uint64_t& serial_no, const uint64_t& drawnumber );
       
-      ACTION processwin(const uint64_t& serial_no );
-      
-      //update ticket by winning number
-      //ACTION updatewintkt( const set<serinal_tier> serinalno_tier );
+      ACTION processwin(const uint64_t& serial_no, const uint64_t& drawnumber );
       
       //update ticket status and pay
-      ACTION claim( const uint64_t& serial_no );
+      ACTION claim( const uint64_t& serial_no, const uint64_t& drawnumber );
 
-      ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, double> dividends);
+
+      ACTION updatediv( const uint64_t& drawnumber, const std::map<uint8_t, asset> dividends);
+
+      //Erase all the table data expect for balance table
+      ACTION reset(int limit, const uint64_t& drawnumber);
+
+      //Update winningtier
+      ACTION updatewint(const uint64_t& serial_no,uint8_t win_tier, const uint64_t& drawnumber);
 };

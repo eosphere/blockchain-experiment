@@ -1,14 +1,4 @@
-const { Api, JsonRpc, RpcError } = require("eosjs");
-const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig"); 
-const fetch = require("node-fetch"); // node only; not needed in browsers
-const { TextEncoder, TextDecoder } = require("util");
-const crypto = require ('crypto');
-
-const defaultPrivateKey = "5JNQzM2iBr9ZhV9DSAoYPjMSn7KxVYSGLRFNFjXwP9FKU34UDZ6"; // bob
-const signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
-
-const rpc = new JsonRpc("https://test.telos.kitchen", { fetch });
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+require('./config.js');
 
 async function randomRange(min, max) {
     const diff = max - min + 1;
@@ -32,23 +22,25 @@ async function randomRange(min, max) {
     return randomNumber + min;
 }
 
-async function getNumbers () {
-    let numbers = [];
-    while (numbers.length < 6) {
-        const randNum = await randomRange (1,45);
-        if (numbers.indexOf(randNum) === -1) {
-            numbers.push (randNum);
+module.exports.getNumbers = 
+    async function getNumbers () {
+        let numbers = [];
+        while (numbers.length < 6) {
+            const randNum = await randomRange (1,45);
+            if (numbers.indexOf(randNum) === -1) {
+                numbers.push (randNum);
+            }
         }
+        return numbers;
     }
-    return numbers;
-}
+
 
 async function createticket () {
     api.transact(
         {
         actions: [
             {
-            account: "experiment11",
+            account: account,
             name: "createticket",
             authorization: [
                 {
@@ -58,8 +50,9 @@ async function createticket () {
             ],
             data: {
                 purchaser: "ticketbuyer1",
-                drawnumber: 0,
-                entrynumbers: await getNumbers()
+                drawnumber: drawno,
+                entrynumbers: await exports.getNumbers(),
+                genreward: true
              }
             }
         ]
@@ -78,3 +71,4 @@ async function createticket () {
 }
 
 createticket ();
+

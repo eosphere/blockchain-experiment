@@ -1,46 +1,93 @@
-
-const { Api, JsonRpc, RpcError } = require('eosjs');
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');     
-const fetch = require('node-fetch');                                    // node only; not needed in browsers
-const { TextEncoder, TextDecoder } = require('util');                
-
-const defaultPrivateKey = "5Ke3bVZBoyixVhhFtXUNPHn1fiDAYsPdi7L9CcBmL5aQrUCrGhN"; // bob
-const signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
-
-const rpc = new JsonRpc("https://hub.area240.com", { fetch });
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
-const drawno  = 0;
-const account = "experiment13";
+require('./config.js');
 var winnumbers = Array(6);
-
+var totalDrawTickets = 0;
+var totalTickets = 0;
+var totalWinners = 0;
+var tickets;
+var limit = 500;
+var next=0;
+var batch = 1;
 
 async function getTickets () {
 
-    const tickets = await rpc.get_table_rows({
-        "json": true,
-        "code": account, 
-        "scope": account, 
-        "table": "tickets", 
-        "key_type": "i64",
-        "index_position":3,
-        "lower_bound":drawno,
-        "upper_bound":drawno,
-        "limit": 10000,
-    })
-    tickets.rows.forEach(async function (item, index) {
-        
-        var res = winnumbers.filter(f => item.entrynumbers.includes(f));
-        if(res.length >= 4)
-        console.log ("Won!!! : "+item.entrynumbers + " div : "+((6-res.length+1)));
-        else
-        console.log ("No win for ticket : "+item.serialno +" entry no : "+item.entrynumbers);
-        
-    });
+	do
+	{
+		console.log ("Processing Batch - " + batch + ". Lower Bound: " + next + ", Upper Bound: " + (next + limit - 1));
+		
+		tickets = await rpc.get_table_rows({
+			"json": true,
+			"code": account, 
+			"scope": drawno, 
+			"table": "tickets", 
+			"lower_bound":next,
+			"upper_bound":next + limit - 1,
+			"limit": limit,
+		})
+		totalDrawTickets = totalDrawTickets + tickets.rows.length;
+		tickets.rows.forEach(async function (item, index) {
+			//Check ticket not cancelled or claimed
+			if(item.ticket_status == 0) {
+			totalTickets++;
+			var res = winnumbers.filter(f => item.entrynumbers.includes(f));
+			if(res.length >= 4)  {
+					totalWinners++;
+					updateticket (item.serialno,(6-res.length+1));
+					//console.log ("Winning Ticket : Serial No: " + item.serialno + " EntryNo: " + item.entrynumbers + " Tier :" + (6-res.length+1));
+				}
+			}
+		});
+		if(tickets.rows.length > 0)
+		{
+			next =  tickets.rows[tickets.rows.length-1].serialno + 1;
+			batch++;
+		}
+	}while(tickets.rows.length > 0)
+	
+    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    console.log ("Total Draw tickets : "+totalDrawTickets);
+    console.log ("Total Open tickets : "+totalTickets);
+    console.log ("Total Winning tickets : "+totalWinners);
+    console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
+async function updateticket (serialno,wintier) {
+    api.transact(
+        {
+        actions: [
+            {
+            account: account,
+            name: "updatewint",
+            authorization: [
+                {
+                actor: account,
+                permission: "active"
+                }
+            ],
+            data: {
+                serial_no: serialno,
+                win_tier: wintier,
+				drawnumber: drawno
+             }
+            }
+        ]
+        },
+        {
+        blocksBehind: 3,
+        expireSeconds: 30
+        }
+    )
+    .then(function(result) {
+        console.log ("Successfully updated winning tier for ticket no: " + serialno + ", Winning Div: " + wintier);
+    })
+    .catch(function(e) {
+        console.log(e);
+    });
+}
+// Get winning numbers
 async function getWinNumbers () {
 
+	var isClosed;
+	
     const draws = await rpc.get_table_rows({
         "json": true,
         "code": account, 
@@ -53,11 +100,35 @@ async function getWinNumbers () {
         "limit": 1,
     })
 
-    draws.rows.forEach(async function (item, index) {
-      winnumbers = item.winningnumbers;
-      console.log ("Draw no : "+item.drawnumber+" win numbers : "+winnumbers);
-        
-    });
+      if(draws.rows.length == 1)
+	  {
+		winnumbers = draws.rows[0].winningnumbers;
+		isOpen = draws.rows[0].open;
+	  }
+	  console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	  console.log ("Runing node : " + url);
+	  console.log ("Draw no: " + drawno);
+	  console.log ("Win Numbers: " + winnumbers); 
+	  console.log ("Draw Status: " + (isOpen == 1 ? "Open" : "Closed"));
+	  console.log ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	  return isOpen;
+      
 }
-getWinNumbers ();
-setTimeout(getTickets,1000);
+
+async function startProcess () {
+	var startTime = Date.now();
+	console.log("**Start Time: " + Date(startTime) + "**");
+
+	var isDrawOpen = await getWinNumbers ();
+	
+	if(isDrawOpen)
+		console.log ("Draw is not yet closed. Process aborted!!");
+	else	
+		await getTickets ();
+	
+	var endTime = Date.now();
+	console.log("**End Time: " + Date(endTime) + "**");
+	console.log("**Total time taken : " + (endTime - startTime) + " ms**");
+}
+
+startProcess();
