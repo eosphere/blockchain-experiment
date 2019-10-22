@@ -36,14 +36,14 @@ const Dashboard = () => {
           </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={3}>
+      <Grid item xs={12} md={4}>
         <Paper className={fixedHeightPaper}>
           <LoadingWrapper wallet={wallet}>
             <BankBalance wallet={wallet} />
           </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={5}>
         <Paper className={fixedHeightPaper}>
           <LoadingWrapper wallet={wallet}>
             <Balance wallet={wallet} />
