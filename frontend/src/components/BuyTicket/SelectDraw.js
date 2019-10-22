@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
 const SelectDraw = props => {
   const classes = useStyles();
   const [values, setValues] = React.useState({
-    draw: ''
+    draw: props.drawNumber
   });
   const { draws } = props;
   const handleChange = event => {
