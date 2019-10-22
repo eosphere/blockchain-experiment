@@ -132,7 +132,6 @@ const HeaderAppBar = props => {
                     vertical: 'top',
                     horizontal: 'right'
                   }}>
-                  {/* <MenuItem>My Account</MenuItem> */}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </>
