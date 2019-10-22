@@ -4,7 +4,7 @@ This is a react project which simulates a lottery game. Users can purchase ticke
 
 https://eostabcorp.now.sh
 
-<img width="500" alt="Screenshot" src="https://user-images.githubusercontent.com/3621147/66882291-3242f200-f00d-11e9-8611-386f187e9e5b.png">
+<img width="500" alt="Screenshot" src="https://user-images.githubusercontent.com/3621147/67344329-21e5c680-f57b-11e9-9a9e-3694b09d6b39.png">
 
 Languages / Framework / Dependenies used:
 
@@ -56,6 +56,8 @@ cd blockchain-experiment/frontend
 ```
 yarn install
 ```
+
+Duplicate the `example.env` and name to `.env` and set the `REACT_APP_NETWORK_CHAIN_ID` to chain ID (same as your scatter setup).
 
 To start in development mode:
 
