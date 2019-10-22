@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Typography, Box, CircularProgress } from '@material-ui/core';
 import Title from './Title';
 import { TOKEN_WALLET_CONTRACT } from 'utils';
-import { SET_BANK_BALANCE } from 'store/actions';
+import { setBalance } from 'store/account';
 
 class BankBalance extends React.PureComponent {
   state = {
@@ -17,7 +17,7 @@ class BankBalance extends React.PureComponent {
       wallet: {
         accountInfo: { account_name: accountName }
       },
-      dispatch
+      setBalance
     } = this.props;
     try {
       const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
@@ -28,7 +28,7 @@ class BankBalance extends React.PureComponent {
       });
       const { balance } = balances.find(row => row.balance.includes('AUD'));
       this.setState({ funds: balance, loading: false }, () => {
-        dispatch({ type: SET_BANK_BALANCE, payload: balance });
+        setBalance(balance, 'bank');
       });
     } catch (error) {
       this.setState({
@@ -44,7 +44,7 @@ class BankBalance extends React.PureComponent {
         {!loading ? (
           <>
             <Title>External Wallet Balance</Title>
-            <Typography component="span" variant="h4">
+            <Typography component="span" variant="h5">
               <strong>
                 {funds && funds.includes('AUD') && '$ '}
                 {funds || `$ 0 AUD`}
@@ -66,4 +66,13 @@ class BankBalance extends React.PureComponent {
   }
 }
 
-export default connect()(BankBalance);
+const mapStateToProps = () => ({});
+
+const actions = {
+  setBalance
+};
+
+export default connect(
+  mapStateToProps,
+  actions
+)(BankBalance);

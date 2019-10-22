@@ -8,13 +8,12 @@ import {
   DialogTitle,
   CircularProgress
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import { Ticket } from '../BuyTicket';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { REFRESH } from 'store/actions';
+import { refreshDashoard } from 'store/account';
 
 const SetNumbersDialog = ({
   success,
@@ -32,7 +31,7 @@ const SetNumbersDialog = ({
   let history = useHistory();
   const dispatch = useDispatch();
   const refresh = () => {
-    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    dispatch(refreshDashoard('setNumbers'));
     toggleDialog();
     history.push('/loading');
     history.goBack();

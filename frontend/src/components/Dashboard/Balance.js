@@ -4,7 +4,7 @@ import { Typography, Box, CircularProgress, makeStyles } from '@material-ui/core
 import Transfer from './Transfer';
 import Title from './Title';
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
-import { SET_REWARD_BALANCE, SET_WALLET_BALANCE } from 'store/actions';
+import { setBalance } from 'store/account';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -33,7 +33,7 @@ class Balance extends React.PureComponent {
       wallet: {
         accountInfo: { account_name: accountName }
       },
-      dispatch
+      setBalance
     } = this.props;
     this.setState({ accountName });
     try {
@@ -52,8 +52,8 @@ class Balance extends React.PureComponent {
       const { funds } = balances.find(row => row.funds.includes('AUD'));
       const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
       this.setState({ funds, tokenBalance, loading: false }, () => {
-        dispatch({ type: SET_REWARD_BALANCE, payload: tokenBalance });
-        dispatch({ type: SET_WALLET_BALANCE, payload: funds });
+        setBalance(tokenBalance, 'reward');
+        setBalance(funds, 'wallet');
       });
     } catch (error) {
       this.setState(
@@ -62,8 +62,8 @@ class Balance extends React.PureComponent {
           tokenBalance: '0'
         },
         () => {
-          dispatch({ type: SET_REWARD_BALANCE, payload: '0 LOTT' });
-          dispatch({ type: SET_WALLET_BALANCE, payload: '0 AUD' });
+          setBalance('0 LOTT', 'reward');
+          setBalance('0 AUD', 'wallet');
         }
       );
     }
@@ -112,4 +112,13 @@ class Balance extends React.PureComponent {
   }
 }
 
-export default connect()(Balance);
+const mapStateToProps = () => ({});
+
+const actions = {
+  setBalance
+};
+
+export default connect(
+  mapStateToProps,
+  actions
+)(Balance);

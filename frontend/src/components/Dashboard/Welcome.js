@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { makeStyles, Button, Box } from '@material-ui/core';
 import { WalletContext } from 'App';
 import { Title } from 'components/Dashboard';
-import { SET_ACCOUNT } from 'store/actions';
+import { setAccount } from 'store/account';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -31,7 +31,7 @@ const Welcome = () => {
   const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch({ type: SET_ACCOUNT, payload: accountName });
+    dispatch(setAccount(accountName));
   }, [accountName, dispatch]);
 
   let history = useHistory();

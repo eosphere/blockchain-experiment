@@ -9,12 +9,11 @@ import {
   Box,
   CircularProgress
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Message } from 'components/Shared';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { REFRESH } from 'store/actions';
+import { refreshDashoard } from 'store/account';
 
 const OpenDrawDialog = ({
   success,
@@ -29,7 +28,7 @@ const OpenDrawDialog = ({
   let history = useHistory();
   const dispatch = useDispatch();
   const refresh = () => {
-    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    dispatch(refreshDashoard('openDraw'));
     toggleDialog();
     history.push('/loading');
     history.goBack();

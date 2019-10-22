@@ -16,7 +16,7 @@ import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import Balances from './Balances';
 import { useSelector, useDispatch } from 'react-redux';
-import { LOGOUT } from 'store/actions';
+import { logout } from 'store/account';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -76,7 +76,7 @@ const HeaderAppBar = props => {
   const handleLogout = () => {
     handleClose();
     const wallet = WAL.accessContext.getActiveWallets()[0];
-    dispatch({ type: LOGOUT });
+    dispatch(logout());
     wallet.terminate().then(() => {
       localStorage.removeItem('loggedIn');
     });

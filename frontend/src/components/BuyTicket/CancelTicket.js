@@ -15,7 +15,7 @@ import { TOKEN_SMARTCONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { REFRESH } from 'store/actions';
+import { refreshDashoard } from 'store/account';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,7 +46,7 @@ const CancelTicketDialog = ({
   let history = useHistory();
   const dispatch = useDispatch();
   const refresh = () => {
-    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    dispatch(refreshDashoard('cancelTicket'));
     toggleDialog();
     history.push('/loading');
     history.goBack();

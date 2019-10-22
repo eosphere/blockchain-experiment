@@ -9,12 +9,11 @@ import {
   DialogTitle,
   CircularProgress
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { REFRESH } from 'store/actions';
+import { refreshDashoard } from 'store/account';
 
 const ExchangeDialog = ({
   success,
@@ -30,7 +29,7 @@ const ExchangeDialog = ({
   let history = useHistory();
   const dispatch = useDispatch();
   const refresh = () => {
-    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    dispatch(refreshDashoard('exchange'));
     toggleDialog();
     history.push('/loading');
     history.goBack();

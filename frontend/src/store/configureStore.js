@@ -1,7 +1,8 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogger } from 'redux-logger';
-import { accountReducer } from './reducers';
+import { accountReducer } from './account';
+import { isProduction } from 'utils';
 
 const rootReducer = combineReducers({
   currentAccount: accountReducer
@@ -10,7 +11,7 @@ const rootReducer = combineReducers({
 const loggerMiddleware = createLogger();
 
 export default function configureStore() {
-  const middlewares = [loggerMiddleware];
+  const middlewares = isProduction ? [] : [loggerMiddleware];
   const middleWareEnhancer = applyMiddleware(...middlewares);
   return createStore(rootReducer, composeWithDevTools(middleWareEnhancer));
 }

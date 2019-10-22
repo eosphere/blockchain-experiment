@@ -14,7 +14,7 @@ import { Message } from 'components/Shared';
 import TransferForm from './TransferForm';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { REFRESH } from 'store/actions';
+import { refreshDashoard } from 'store/account';
 
 const TransferDialog = ({
   success,
@@ -32,7 +32,7 @@ const TransferDialog = ({
   let history = useHistory();
   const dispatch = useDispatch();
   const refresh = () => {
-    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    dispatch(refreshDashoard('transfer'));
     toggleDialog();
     history.push('/loading');
     history.goBack();
