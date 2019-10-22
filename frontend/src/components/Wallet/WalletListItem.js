@@ -43,7 +43,7 @@ function MySnackbarContentWrapper(props) {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    color: '#fff',
+    color: 'white',
     backgroundColor: '#20b6e8',
     '&:hover': {
       backgroundColor: '#1496c1'
@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     minWidth: '310px'
   },
   progress: {
-    color: '#fff'
+    color: 'white'
   }
 }));
 

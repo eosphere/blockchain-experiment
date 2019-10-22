@@ -10,8 +10,11 @@ import {
 } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
-import Message from '../Message';
+import { Message } from 'components/Shared';
 import { Ticket } from '../BuyTicket';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { REFRESH } from 'store/actions';
 
 const SetNumbersDialog = ({
   success,
@@ -21,12 +24,19 @@ const SetNumbersDialog = ({
   open = false,
   toggleDialog,
   onSubmit,
-  redirect,
   drawnumber,
   transactionId,
   numbers,
   children
 }) => {
+  let history = useHistory();
+  const dispatch = useDispatch();
+  const refresh = () => {
+    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    toggleDialog();
+    history.push('/loading');
+    history.goBack();
+  };
   return (
     <Dialog
       open={open}
@@ -68,7 +78,7 @@ const SetNumbersDialog = ({
         {success && (
           <Button
             style={{ minHeight: '52px', minWidth: '75px' }}
-            onClick={redirect}
+            onClick={refresh}
             color="primary"
             variant="contained"
             autoFocus>
@@ -166,10 +176,6 @@ class SetNumbers extends React.PureComponent {
     }
   }
 
-  redirect = () => {
-    window.location.reload();
-  };
-
   render() {
     const { open, loading, error, errorMessage, success, transactionId, numbers = [] } = this.state;
     const { drawnumber } = this.props;
@@ -182,7 +188,6 @@ class SetNumbers extends React.PureComponent {
           error={error}
           errorMessage={errorMessage}
           success={success}
-          redirect={this.redirect}
           open={open}
           loading={loading}
           toggleDialog={this.toggleDialog}

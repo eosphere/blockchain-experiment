@@ -8,7 +8,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     fontWeight: 900,
     margin: `${theme.spacing(1)}px 0`,
-    padding: `${theme.spacing(2)}px ${theme.spacing(2)}px`,
+    padding: theme.spacing(2),
     color: 'white',
     borderRadius: '4px',
     alignItems: 'center'
@@ -32,6 +32,8 @@ const buildTransactionUrl = transactionId => {
   return `https://local.bloks.io/transaction/${transactionId}?nodeUrl=${NETWORK_HOST}&coreSymbol=${CORE_SYMBOL}&systemDomain=${SYSTEM_DOMAIN}`;
 };
 
+const transactionLabel = 'View Transaction';
+
 const Message = ({ type, message, transactionId }) => {
   const classes = useStyles();
   return (
@@ -49,7 +51,7 @@ const Message = ({ type, message, transactionId }) => {
           target="_blank"
           rel="noreferrer noopener"
           className={classes.link}>
-          View Transaction
+          {transactionLabel}
         </Link>
       )}
     </Box>

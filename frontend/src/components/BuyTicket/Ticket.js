@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { makeStyles, Button, Box, Tooltip, CircularProgress } from '@material-ui/core';
 import { purple, grey } from '@material-ui/core/colors';
 
 import { MdDelete, MdStar } from 'react-icons/md';
 import { range, NUMBER_CHOICE_LIMIT, TOTAL_GAME_NUMBERS } from 'utils';
 
-const { createContext, useContext } = React;
 const TicketContext = createContext();
 
 const useStyles = makeStyles(theme => ({
@@ -42,7 +41,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   loading: {
-    color: '#fff'
+    color: 'white'
   },
   active: {
     color: 'white',

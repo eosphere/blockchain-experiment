@@ -10,8 +10,11 @@ import {
   CircularProgress
 } from '@material-ui/core';
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
-import Message from '../Message';
+import { Message } from 'components/Shared';
 import TransferForm from './TransferForm';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { REFRESH } from 'store/actions';
 
 const TransferDialog = ({
   success,
@@ -21,12 +24,19 @@ const TransferDialog = ({
   open = false,
   toggleDialog,
   onSubmit,
-  redirect,
   transactionId,
   children,
   values,
   title
 }) => {
+  let history = useHistory();
+  const dispatch = useDispatch();
+  const refresh = () => {
+    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    toggleDialog();
+    history.push('/loading');
+    history.goBack();
+  };
   return (
     <Dialog
       open={open}
@@ -69,7 +79,7 @@ const TransferDialog = ({
         {success && (
           <Button
             style={{ minHeight: '52px', minWidth: '75px' }}
-            onClick={redirect}
+            onClick={refresh}
             color="primary"
             variant="contained"
             autoFocus>
@@ -148,8 +158,6 @@ class Transfer extends React.PureComponent {
               account: to,
               quantity: total
             };
-
-      console.log(data);
       const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [
@@ -183,10 +191,6 @@ class Transfer extends React.PureComponent {
     }
   }
 
-  redirect = () => {
-    window.location.reload();
-  };
-
   render() {
     const { open, loading, error, errorMessage, success, transactionId, values } = this.state;
     const { type } = this.props;
@@ -200,7 +204,6 @@ class Transfer extends React.PureComponent {
           error={error}
           errorMessage={errorMessage}
           success={success}
-          redirect={this.redirect}
           open={open}
           loading={loading}
           toggleDialog={this.toggleDialog}

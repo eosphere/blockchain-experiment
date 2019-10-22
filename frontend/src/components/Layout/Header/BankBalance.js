@@ -1,5 +1,5 @@
 import React from 'react';
-import { TOKEN_SMARTCONTRACT } from 'utils';
+import { TOKEN_WALLET_CONTRACT } from 'utils';
 import BalanceChip from './BalanceChip';
 
 class Balance extends React.PureComponent {
@@ -17,22 +17,22 @@ class Balance extends React.PureComponent {
       } = this.props;
       const response = await wallet.eosApi.rpc.get_table_rows({
         json: true,
-        code: TOKEN_SMARTCONTRACT,
+        code: TOKEN_WALLET_CONTRACT,
         scope: accountName,
-        table: 'balances'
+        table: 'accounts'
       });
-      const { rows } = response;
-      if (rows.length === 0) return this.setState({ loading: false, funds: '0 AUD' });
-      const { funds } = rows[0];
+      if (response.rows.length === 0) return this.setState({ funds: '0 AUD', loading: false });
+      const { rows: balances } = response;
+      const { balance: funds } = balances.find(row => row.balance.includes('AUD'));
       this.setState({ funds, loading: false });
     } catch (error) {
-      this.setState({ loading: false, funds: '0 AUD' });
+      this.setState({ funds: '0 AUD', loading: false });
     }
   }
   render() {
     const { funds, loading } = this.state;
     if (loading) return null;
-    return <BalanceChip type="wallet" funds={funds} />;
+    return <BalanceChip type="bank" funds={funds} />;
   }
 }
 

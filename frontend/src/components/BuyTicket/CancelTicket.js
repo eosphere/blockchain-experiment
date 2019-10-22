@@ -12,7 +12,10 @@ import {
 } from '@material-ui/core';
 import { MdRemoveCircle } from 'react-icons/md';
 import { TOKEN_SMARTCONTRACT } from 'utils';
-import Message from '../Message';
+import { Message } from 'components/Shared';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { REFRESH } from 'store/actions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   icon: {
-    color: '#fff'
+    color: 'white'
   }
 }));
 
@@ -36,11 +39,18 @@ const CancelTicketDialog = ({
   open = false,
   toggleDialog,
   onSubmit,
-  redirect,
   drawnumber,
   serialno,
   transactionId
 }) => {
+  let history = useHistory();
+  const dispatch = useDispatch();
+  const refresh = () => {
+    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    toggleDialog();
+    history.push('/loading');
+    history.goBack();
+  };
   return (
     <Dialog
       open={open}
@@ -88,7 +98,7 @@ const CancelTicketDialog = ({
         {success && (
           <Button
             style={{ minHeight: '52px', minWidth: '75px' }}
-            onClick={redirect}
+            onClick={refresh}
             color="primary"
             variant="contained"
             autoFocus>
@@ -191,10 +201,6 @@ class CancelTicket extends React.PureComponent {
     }
   }
 
-  redirect = () => {
-    window.location.reload();
-  };
-
   render() {
     const { open, loading, error, errorMessage, success, transactionId } = this.state;
     const { ticket } = this.props;
@@ -209,7 +215,6 @@ class CancelTicket extends React.PureComponent {
               error={error}
               errorMessage={errorMessage}
               success={success}
-              redirect={this.redirect}
               open={open}
               loading={loading}
               toggleDialog={this.toggleDialog}

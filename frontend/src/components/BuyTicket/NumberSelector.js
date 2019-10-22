@@ -6,20 +6,20 @@ import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import SelectDraw from './SelectDraw';
 import Ticket from './Ticket';
-import Message from '../Message';
+import { Message } from 'components/Shared';
 
 const NO_DRAW_ERROR = 'No draw selected. Please select a draw and your lucky numbers.';
 const NO_NUMBERS_ERROR = 'Please select your 6 lucky numbers.';
 
 const ColorCircularProgress = withStyles({
   root: {
-    color: '#fff'
+    color: 'white'
   }
 })(CircularProgress);
 
 const SubmitButton = withStyles({
   root: {
-    color: '#fff',
+    color: 'white',
     backgroundColor: '#ba68c8',
     minHeight: '56px',
     '&:hover': {
@@ -226,15 +226,16 @@ class NumberSelector extends React.PureComponent {
         {() => (
           <>
             <DrawSelector wallet={wallet} />
-            <Button
-              variant="contained"
-              color="default"
-              size="large"
-              type="submit"
-              style={{ marginTop: '8px' }}
-              onClick={this.handleHome}>
-              Back to Home
-            </Button>
+            <Box marginTop="8px">
+              <Button
+                variant="contained"
+                color="default"
+                size="large"
+                type="submit"
+                onClick={this.handleHome}>
+                Back to Home
+              </Button>
+            </Box>
           </>
         )}
       </AccessContextSubscribe>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { AuthenticatedRoute } from './components';
+import { AuthenticatedRoute } from './components/Shared';
 import { Login, Dashboard, BuyTicket } from './pages';
 
 const AppRoutes = () => {

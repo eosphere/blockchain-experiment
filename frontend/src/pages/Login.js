@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect, withRouter } from 'react-router';
 import WAL from 'eos-transit';
-import { SvgIcon, makeStyles, Button, CircularProgress } from '@material-ui/core';
+import { SvgIcon, makeStyles, Button, CircularProgress, Typography } from '@material-ui/core';
 import { ReactComponent as EOSLogo } from 'assets/eos-logo.svg';
 import { ReactComponent as ScatterLogo } from 'assets/scatter-logo.svg';
 import { LoginScreenWalletList } from 'components/Wallet';
@@ -105,22 +105,22 @@ class Login extends React.PureComponent {
     return (
       <Container>
         {showLoginProviders ? (
-          <>
-            <LoginScreenWalletList
-              walletProviders={getWalletProviders()}
-              wallets={getWallets()}
-              onWalletProviderSelect={handleWalletProviderSelect}
-              onWalletReconnectClick={handleWalletReconnectClick}
-              toggleLoginScreen={toggleLoginProviders}
-            />
-          </>
+          <LoginScreenWalletList
+            walletProviders={getWalletProviders()}
+            wallets={getWallets()}
+            onWalletProviderSelect={handleWalletProviderSelect}
+            onWalletReconnectClick={handleWalletReconnectClick}
+            toggleLoginScreen={toggleLoginProviders}
+          />
         ) : (
           <>
             {loading ? (
               <CircularProgress />
             ) : (
               <>
-                <h1 style={{ textAlign: 'center' }}>Welcome to the Blockchain Experiment.</h1>
+                <Typography align="center" variant="h4" gutterBottom>
+                  Welcome to the Blockchain Experiment.
+                </Typography>
                 <Button
                   variant="contained"
                   size="large"

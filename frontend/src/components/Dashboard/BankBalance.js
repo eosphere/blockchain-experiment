@@ -1,30 +1,12 @@
 import React from 'react';
-import { Typography, Box, CircularProgress, makeStyles } from '@material-ui/core';
-import Transfer from './Transfer';
+import { Typography, Box, CircularProgress } from '@material-ui/core';
 import Title from './Title';
-import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
-import Message from '../Message';
-
-const useStyles = makeStyles(theme => ({
-  icon: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1)
-  }
-}));
-
-const LottCoin = () => {
-  const classes = useStyles();
-  return <img alt="Lott Coin" className={classes.icon} width="45px" src="/lott-logo.png" />;
-};
+import { TOKEN_WALLET_CONTRACT } from 'utils';
 
 class BankBalance extends React.PureComponent {
   state = {
     loading: true,
-    funds: '',
-    tokenBalance: '',
-    error: false,
-    errorMessage: '',
-    accountName: ''
+    funds: ''
   };
 
   async componentDidMount() {
@@ -34,7 +16,6 @@ class BankBalance extends React.PureComponent {
         accountInfo: { account_name: accountName }
       }
     } = this.props;
-    this.setState({ accountName });
     try {
       const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
         json: true,
@@ -42,22 +23,17 @@ class BankBalance extends React.PureComponent {
         scope: accountName,
         table: 'accounts'
       });
-      console.log(balances);
       const { balance } = balances.find(row => row.balance.includes('AUD'));
       this.setState({ funds: balance, loading: false });
     } catch (error) {
-      const { message } = error;
       this.setState({
-        loading: false,
-        error: true,
-        errorMessage: `${message}. Please try again.`
+        loading: false
       });
     }
   }
 
   render() {
-    const { loading, tokenBalance, funds, error, errorMessage, accountName } = this.state;
-    const { wallet } = this.props;
+    const { loading, funds } = this.state;
     return (
       <>
         {!loading ? (
@@ -66,10 +42,9 @@ class BankBalance extends React.PureComponent {
             <Typography component="span" variant="h4">
               <strong>
                 {funds && funds.includes('AUD') && '$ '}
-                {funds || `$0`}
+                {funds || `$ 0 AUD`}
               </strong>
             </Typography>
-            {error && <Message type="error" message={errorMessage} />}
           </>
         ) : (
           <Box

@@ -3,7 +3,6 @@ import { Typography, Box, CircularProgress, makeStyles } from '@material-ui/core
 import Transfer from './Transfer';
 import Title from './Title';
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
-import Message from '../Message';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -22,8 +21,6 @@ class Balance extends React.PureComponent {
     loading: true,
     funds: '',
     tokenBalance: '',
-    error: false,
-    errorMessage: '',
     accountName: ''
   };
 
@@ -34,9 +31,7 @@ class Balance extends React.PureComponent {
         accountInfo: { account_name: accountName }
       }
     } = this.props;
-
     this.setState({ accountName });
-
     try {
       const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
         json: true,
@@ -54,41 +49,38 @@ class Balance extends React.PureComponent {
       const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
       this.setState({ funds, tokenBalance, loading: false });
     } catch (error) {
-      const { message } = error;
       this.setState({
         loading: false,
-        error: true,
-        errorMessage: `${message}. Please try again.`
+        tokenBalance: '0'
       });
     }
   }
 
   render() {
-    const { loading, tokenBalance, funds, error, errorMessage, accountName } = this.state;
+    const { loading, tokenBalance, funds, accountName } = this.state;
     const { wallet } = this.props;
     return (
       <>
         {!loading ? (
           <>
             <Title>Lottery Account Balances</Title>
-            {error && <Message type="error" message={errorMessage} />}
-            <Typography component="span" variant="h4">
+            <Typography component="span" variant="h4" gutterBottom>
               <strong>{`Ł ` + tokenBalance || `0 LOTT (Ł)`}</strong>
               <LottCoin />
-              <Transfer type="claim" currency="LOTT" accountName={accountName} wallet={wallet} />
+              {tokenBalance !== '0' && (
+                <Transfer type="claim" currency="LOTT" accountName={accountName} wallet={wallet} />
+              )}
             </Typography>
-            <Typography component="span" variant="h4">
+            <Typography component="span" variant="h4" gutterBottom>
               <strong>
                 {funds && funds.includes('AUD') && '$ '}
-                {funds || `$0`}
+                {funds || `$ 0 AUD`}
               </strong>
-              {/* <Transfer type="deposit" currency="AUD" accountName={accountName} wallet={wallet} /> */}
-              {/* <Transfer type="withdraw" currency="AUD" accountName={accountName} wallet={wallet} /> */}
             </Typography>
-            <Typography component="p" variant="body1">
+            <Typography component="p" variant="body1" gutterBottom>
               <strong>$1.00 AUD = 30 LOTT Tokens</strong>
             </Typography>
-            <Typography component="p" variant="body1">
+            <Typography component="p" variant="body1" gutterBottom>
               <strong>1 Lottery Ticket = 10 LOTT Tokens</strong>
             </Typography>
           </>

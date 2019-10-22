@@ -10,7 +10,10 @@ import {
 } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
-import Message from '../Message';
+import { Message } from 'components/Shared';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { REFRESH } from 'store/actions';
 
 const CloseDrawDialog = ({
   success,
@@ -20,10 +23,17 @@ const CloseDrawDialog = ({
   open = false,
   toggleDialog,
   onSubmit,
-  redirect,
   drawnumber,
   transactionId
 }) => {
+  let history = useHistory();
+  const dispatch = useDispatch();
+  const refresh = () => {
+    dispatch({ type: REFRESH, payload: 'transferRefresh' });
+    toggleDialog();
+    history.push('/loading');
+    history.goBack();
+  };
   return (
     <Dialog
       open={open}
@@ -68,7 +78,7 @@ const CloseDrawDialog = ({
         {success && (
           <Button
             style={{ minHeight: '52px', minWidth: '75px' }}
-            onClick={redirect}
+            onClick={refresh}
             color="primary"
             variant="contained"
             autoFocus>
@@ -159,10 +169,6 @@ class CloseDraw extends React.PureComponent {
     }
   }
 
-  redirect = () => {
-    window.location.reload();
-  };
-
   render() {
     const { open, loading, error, errorMessage, success, transactionId } = this.state;
     const { drawnumber } = this.props;
@@ -175,7 +181,6 @@ class CloseDraw extends React.PureComponent {
           error={error}
           errorMessage={errorMessage}
           success={success}
-          redirect={this.redirect}
           open={open}
           loading={loading}
           toggleDialog={this.toggleDialog}

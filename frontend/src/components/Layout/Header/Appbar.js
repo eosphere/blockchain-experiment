@@ -1,5 +1,4 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import {
   MenuItem,
   Menu,
@@ -16,11 +15,12 @@ import { MdExpandMore, MdAccountCircle, MdBrightness4, MdBrightness7 } from 'rea
 import WAL from 'eos-transit';
 import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import Balance from './Balance';
+import BankBalance from './BankBalance';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
     background: theme.palette.type === 'dark' && '#424242',
-    color: '#fff'
+    color: 'white'
   },
   menuButton: {
     marginRight: theme.spacing(1),
@@ -33,6 +33,14 @@ const useStyles = makeStyles(theme => ({
   title: {
     flexGrow: 1
   },
+  downArrow: {
+    width: theme.spacing(3),
+    height: theme.spacing(3)
+  },
+  icon: {
+    width: theme.spacing(3),
+    height: theme.spacing(3)
+  },
   name: {
     marginLeft: theme.spacing(1),
     fontWeight: 'bold',
@@ -41,14 +49,6 @@ const useStyles = makeStyles(theme => ({
   dialog: {
     minWidth: '300px',
     minHeight: '150px'
-  },
-  downArrow: {
-    width: theme.spacing(3),
-    height: theme.spacing(3)
-  },
-  icon: {
-    width: theme.spacing(3),
-    height: theme.spacing(3)
   }
 }));
 
@@ -76,6 +76,7 @@ const HeaderAppBar = props => {
   };
 
   const isLoggedIn = WAL.accessContext.getActiveWallets().length > 0;
+  const { toggleTheme } = props;
 
   let name;
   let wallet;
@@ -85,8 +86,6 @@ const HeaderAppBar = props => {
       name = wallet.accountInfo.account_name;
     }
   }
-
-  const { toggleTheme } = props;
 
   return (
     <AccessContextSubscribe>
@@ -103,6 +102,7 @@ const HeaderAppBar = props => {
             </Tooltip>
             {isLoggedIn && (
               <>
+                {name && <BankBalance wallet={wallet} />}
                 {name && <Balance wallet={wallet} />}
                 <Tooltip title="Account Menu" enterDelay={300}>
                   <Button
@@ -132,7 +132,7 @@ const HeaderAppBar = props => {
                     vertical: 'top',
                     horizontal: 'right'
                   }}>
-                  <MenuItem>My Account</MenuItem>
+                  {/* <MenuItem>My Account</MenuItem> */}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </>
@@ -144,4 +144,4 @@ const HeaderAppBar = props => {
   );
 };
 
-export default withRouter(HeaderAppBar);
+export default HeaderAppBar;

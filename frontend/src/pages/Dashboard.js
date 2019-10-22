@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
-import { useHistory } from 'react-router-dom';
-import Balance from 'components/Dashboard/Balance';
-import BankBalance from 'components/Dashboard/BankBalance';
-import Transactions from 'components/Dashboard/Transactions';
-import Title from 'components/Dashboard/Title';
-import Draws from 'components/Dashboard/Draws';
-import WAL from 'eos-transit';
-
-import { makeStyles, Grid, Paper, Button, CircularProgress, Box } from '@material-ui/core';
+import {
+  Balance,
+  BankBalance,
+  Transactions,
+  Draws,
+  Welcome,
+  LoadingWrapper
+} from 'components/Dashboard';
+import { makeStyles, Grid, Paper } from '@material-ui/core';
+import { WalletContext } from 'App';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -20,96 +20,48 @@ const useStyles = makeStyles(theme => ({
   },
   fixedHeight: {
     minHeight: 300
-  },
-  title: {
-    textTransform: 'capitalize'
   }
 }));
-
-const Welcome = ({ wallet }) => {
-  const classes = useStyles();
-  const {
-    accountInfo: { account_name: accountName }
-  } = wallet;
-  let history = useHistory();
-  const dispatch = useDispatch();
-
-  const buyTicket = () => {
-    history.push('/buy/ticket');
-  };
-
-  useEffect(() => {
-    dispatch({ type: 'SET_ACCOUNT', payload: { name: accountName } });
-  }, [accountName, dispatch]);
-
-  const isAdmin = useSelector(state => state.currentAccount.account.name) === 'numberselect';
-
-  return (
-    <>
-      <Title className={classes.title}>Welcome, {accountName}.</Title>
-
-      {!isAdmin && (
-        <Box display="flex" marginY={2}>
-          <Button variant="contained" color="primary" size="large" onClick={buyTicket}>
-            Buy a Lottery Ticket
-          </Button>
-        </Box>
-      )}
-    </>
-  );
-};
-
-const Wrapper = ({ wallet, children }) => {
-  const { accountInfo } = wallet;
-  if (!accountInfo)
-    return (
-      <Box
-        flexGrow="1"
-        display="flex"
-        alignItems="center"
-        flexDirection="column"
-        justifyContent="center">
-        <CircularProgress />
-      </Box>
-    );
-  return <>{children}</>;
-};
 
 const Dashboard = () => {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const wallet = WAL.accessContext.getActiveWallets()[0];
+  const { wallet } = useContext(WalletContext);
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={2} lg={3}>
         <Paper className={fixedHeightPaper}>
-          <Wrapper wallet={wallet}>
-            <Welcome wallet={wallet} />
-          </Wrapper>
+          <LoadingWrapper wallet={wallet}>
+            <Welcome />
+          </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={3} lg={3}>
         <Paper className={fixedHeightPaper}>
-          <Wrapper wallet={wallet}>
+          <LoadingWrapper wallet={wallet}>
             <BankBalance wallet={wallet} />
-          </Wrapper>
+          </LoadingWrapper>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={4} lg={4}>
+      <Grid item xs={12} md={6} lg={6}>
         <Paper className={fixedHeightPaper}>
-          <Wrapper wallet={wallet}>
+          <LoadingWrapper wallet={wallet}>
             <Balance wallet={wallet} />
-          </Wrapper>
+          </LoadingWrapper>
         </Paper>
       </Grid>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          {wallet && wallet.accountInfo && <Transactions wallet={wallet} />}
+          <LoadingWrapper wallet={wallet}>
+            <Transactions wallet={wallet} />
+          </LoadingWrapper>
         </Paper>
       </Grid>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <Draws wallet={wallet} />
+          <LoadingWrapper wallet={wallet}>
+            <Draws wallet={wallet} />
+          </LoadingWrapper>
         </Paper>
       </Grid>
     </Grid>
