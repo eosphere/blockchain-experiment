@@ -86,7 +86,7 @@ class Transactions extends React.PureComponent {
       this.setState({ currentDraw: value, transactionsLoading: true }, () => {
         setTimeout(() => {
           this.fetchTransactions();
-        }, 300);
+        }, 250);
       });
   };
 

@@ -43,7 +43,7 @@ const TransferDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">
-        {success ? `${title} Success` : `${title} Tokens`}
+        {success ? `${title} Success` : `${title} Token Currency`}
       </DialogTitle>
       <DialogContent>
         {!success && children}
@@ -155,8 +155,16 @@ class Transfer extends React.PureComponent {
       scope: accountName,
       table: 'accounts'
     });
+    const { rows: bankBalances } = await wallet.eosApi.rpc.get_table_rows({
+      json: true,
+      code: TOKEN_WALLET_CONTRACT,
+      scope: accountName,
+      table: 'accounts'
+    });
+    const { balance: bankBalance } = bankBalances.find(row => row.balance.includes('AUD'));
     const { funds } = balances.find(row => row.funds.includes('AUD'));
     const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
+    setBalance(bankBalance, 'bank');
     setBalance(tokenBalance, 'reward');
     setBalance(funds, 'wallet');
   }
@@ -166,18 +174,17 @@ class Transfer extends React.PureComponent {
     const {
       values: { from, to, quantity, currency, memo }
     } = this.state;
-
     try {
       const actionName = type === 'withdraw' ? 'withdraw' : 'transfer';
       const account = type === 'withdraw' ? TOKEN_SMARTCONTRACT : TOKEN_WALLET_CONTRACT;
       const total = `${parseFloat(quantity).toFixed(2)} ${currency}`;
       const data =
-        type !== 'withdraw' || type !== 'claim'
-          ? { from, to, quantity: total, memo }
-          : {
+        type === 'withdraw'
+          ? {
               account: to,
               quantity: total
-            };
+            }
+          : { from, to, quantity: total, memo };
       const { transaction_id: transactionId } = await wallet.eosApi.transact(
         {
           actions: [

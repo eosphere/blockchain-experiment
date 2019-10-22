@@ -88,6 +88,10 @@ class Balance extends React.PureComponent {
                 {walletBalance || `$ 0 AUD`}
               </strong>
             </Typography>
+            <Typography component="span" variant="h4" gutterBottom>
+              <Transfer type="deposit" currency="AUD" accountName={accountName} wallet={wallet} />
+              <Transfer type="withdraw" currency="AUD" accountName={accountName} wallet={wallet} />
+            </Typography>
             <Typography component="p" variant="body1" gutterBottom>
               <strong>$1.00 AUD = 30 LOTT Tokens</strong>
             </Typography>
