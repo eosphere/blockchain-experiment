@@ -16,7 +16,12 @@ global.api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), t
 
 global.range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
-global.drawno  = 11;
+global.drawno  = 29;
 global.account = "experiment13";
 global.min_winning_tier = 1;
 global.max_winning_tier = 4;
+global.loadTestURI = "https://d6fu68n5da.execute-api.ap-southeast-2.amazonaws.com/default/BuyTicketLoadTest?drawno={0}&ticketspercall={1}&totalcalls={2}&contract={3}&buyer={4}";
+global.totalCalls = 10;
+global.ticketsPerCall = 30;
+global.interval = 300; //ms
+global.buyer = "ticketbuyer4";
