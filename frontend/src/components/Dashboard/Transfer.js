@@ -13,8 +13,8 @@ import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import TransferForm from './TransferForm';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { refreshDashoard } from 'store/account';
+import { connect, useDispatch } from 'react-redux';
+import { setBalance, refreshDashoard } from 'store/account';
 
 const TransferDialog = ({
   success,
@@ -141,6 +141,26 @@ class Transfer extends React.PureComponent {
     this.setState({ values });
   };
 
+  async fetchBalances() {
+    const { wallet, accountName, setBalance } = this.props;
+    const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
+      json: true,
+      code: TOKEN_SMARTCONTRACT,
+      scope: accountName,
+      table: 'balances'
+    });
+    const { rows: accounts } = await wallet.eosApi.rpc.get_table_rows({
+      json: true,
+      code: TOKEN_WALLET_CONTRACT,
+      scope: accountName,
+      table: 'accounts'
+    });
+    const { funds } = balances.find(row => row.funds.includes('AUD'));
+    const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
+    setBalance(tokenBalance, 'reward');
+    setBalance(funds, 'wallet');
+  }
+
   async Transfer() {
     const { wallet, accountName, type } = this.props;
     const {
@@ -179,7 +199,7 @@ class Transfer extends React.PureComponent {
           expireSeconds: 60
         }
       );
-      this.setState({ loading: false, success: true, transactionId });
+      this.setState({ loading: false, success: true, transactionId }, () => this.fetchBalances());
     } catch (error) {
       const { message } = error;
       this.setState({
@@ -218,4 +238,11 @@ class Transfer extends React.PureComponent {
   }
 }
 
-export default Transfer;
+const mapStateToProps = () => ({});
+
+const actions = { setBalance };
+
+export default connect(
+  mapStateToProps,
+  actions
+)(Transfer);

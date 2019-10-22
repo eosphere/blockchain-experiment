@@ -23,7 +23,6 @@ class Balance extends React.PureComponent {
   state = {
     loading: true,
     funds: '',
-    tokenBalance: '',
     accountName: ''
   };
 
@@ -51,15 +50,14 @@ class Balance extends React.PureComponent {
       });
       const { funds } = balances.find(row => row.funds.includes('AUD'));
       const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
-      this.setState({ funds, tokenBalance, loading: false }, () => {
+      this.setState({ loading: false }, () => {
         setBalance(tokenBalance, 'reward');
         setBalance(funds, 'wallet');
       });
     } catch (error) {
       this.setState(
         {
-          loading: false,
-          tokenBalance: '0'
+          loading: false
         },
         () => {
           setBalance('0 LOTT', 'reward');
@@ -70,24 +68,24 @@ class Balance extends React.PureComponent {
   }
 
   render() {
-    const { loading, tokenBalance, funds, accountName } = this.state;
-    const { wallet } = this.props;
+    const { loading, accountName } = this.state;
+    const { wallet, rewardBalance, walletBalance } = this.props;
     return (
       <>
         {!loading ? (
           <>
             <Title>Lottery Account Balances</Title>
             <Typography component="span" variant="h4" gutterBottom>
-              <strong>{`Ł ` + tokenBalance || `0 LOTT (Ł)`}</strong>
+              <strong>{`Ł ` + rewardBalance || `0 LOTT (Ł)`}</strong>
               <LottCoin />
-              {tokenBalance !== '0' && (
+              {rewardBalance !== '0' && (
                 <Transfer type="claim" currency="LOTT" accountName={accountName} wallet={wallet} />
               )}
             </Typography>
             <Typography component="span" variant="h4" gutterBottom>
               <strong>
-                {funds && funds.includes('AUD') && '$ '}
-                {funds || `$ 0 AUD`}
+                {walletBalance && walletBalance.includes('AUD') && '$ '}
+                {walletBalance || `$ 0 AUD`}
               </strong>
             </Typography>
             <Typography component="p" variant="body1" gutterBottom>
@@ -112,7 +110,10 @@ class Balance extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  rewardBalance: state.currentAccount.balances.reward,
+  walletBalance: state.currentAccount.balances.wallet
+});
 
 const actions = {
   setBalance
