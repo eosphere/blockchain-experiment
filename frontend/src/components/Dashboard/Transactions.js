@@ -30,8 +30,7 @@ class Transactions extends React.PureComponent {
       limit: 200,
       reverse: true
     });
-    const { rows: drawRows } = drawResponse;
-    const draws = drawRows.filter(draw => draw.open === 1);
+    const { rows: draws } = drawResponse;
     const { drawnumber: drawNumber } = draws[0] || '';
     this.mounted &&
       this.setState({ draws, currentDraw: drawNumber }, () => {
