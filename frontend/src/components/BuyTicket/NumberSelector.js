@@ -7,6 +7,7 @@ import AccessContextSubscribe from 'transit/AccessContextSubscribe';
 import SelectDraw from './SelectDraw';
 import Ticket from './Ticket';
 import { Message } from 'components/Shared';
+import Loading from '../Loading';
 
 const NO_DRAW_ERROR = 'No draw selected. Please select a draw and your lucky numbers.';
 const NO_NUMBERS_ERROR = 'Please select your 6 lucky numbers.';
@@ -169,16 +170,7 @@ class DrawSelector extends React.PureComponent {
       randomLoading
     } = this.state;
     if (loading) {
-      return (
-        <Box
-          flexGrow="1"
-          display="flex"
-          alignItems="center"
-          flexDirection="column"
-          justifyContent="center">
-          <CircularProgress />
-        </Box>
-      );
+      return <Loading />;
     }
     return (
       <>

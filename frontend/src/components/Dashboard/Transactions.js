@@ -4,18 +4,7 @@ import { TOKEN_SMARTCONTRACT } from 'utils';
 import Table from './TransactionsTable';
 import Title from './Title';
 import { SelectDraw } from 'components/BuyTicket';
-import { Box, CircularProgress } from '@material-ui/core';
-
-const LoadingSpinner = () => (
-  <Box
-    flexGrow="1"
-    display="flex"
-    alignItems="center"
-    flexDirection="column"
-    justifyContent="center">
-    <CircularProgress />
-  </Box>
-);
+import Loading from 'components/Loading';
 
 class Transactions extends React.PureComponent {
   state = {
@@ -95,22 +84,13 @@ class Transactions extends React.PureComponent {
     const { wallet, isTicketBuyer } = this.props;
 
     if (loading) {
-      return (
-        <Box
-          flexGrow="1"
-          display="flex"
-          alignItems="center"
-          flexDirection="column"
-          justifyContent="center">
-          <CircularProgress />
-        </Box>
-      );
+      return <Loading />;
     }
     return (
       <>
         <Title>{isTicketBuyer && `Your `}Recent Purchases</Title>
         <SelectDraw draws={draws} drawNumber={currentDraw} onClick={this.onClick} />
-        {transactionsLoading ? <LoadingSpinner /> : <Table rows={rows} wallet={wallet} />}
+        {transactionsLoading ? <Loading /> : <Table rows={rows} wallet={wallet} />}
       </>
     );
   }

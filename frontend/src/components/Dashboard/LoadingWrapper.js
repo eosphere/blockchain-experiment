@@ -1,19 +1,9 @@
 import React from 'react';
-import { Box, CircularProgress } from '@material-ui/core';
+import Loading from 'components/Loading';
 
 const LoadingWrapper = ({ wallet, children }) => {
   const { accountInfo } = wallet;
-  if (!accountInfo)
-    return (
-      <Box
-        flexGrow="1"
-        display="flex"
-        alignItems="center"
-        flexDirection="column"
-        justifyContent="center">
-        <CircularProgress />
-      </Box>
-    );
+  if (!accountInfo) return <Loading />;
   return <>{children}</>;
 };
 

@@ -9,7 +9,7 @@ import {
   DialogTitle,
   CircularProgress
 } from '@material-ui/core';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { TOKEN_SMARTCONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import { useHistory } from 'react-router-dom';
