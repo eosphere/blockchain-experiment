@@ -12,9 +12,8 @@ import {
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import TransferForm from './TransferForm';
-import { useHistory } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
-import { setBalance, refreshDashoard } from 'store/account';
+import { connect } from 'react-redux';
+import { setBalance } from 'store/account';
 
 const TransferDialog = ({
   success,
@@ -29,13 +28,8 @@ const TransferDialog = ({
   values,
   title
 }) => {
-  let history = useHistory();
-  const dispatch = useDispatch();
   const refresh = () => {
-    dispatch(refreshDashoard('transfer'));
     toggleDialog();
-    history.push('/loading');
-    history.goBack();
   };
   return (
     <Dialog
