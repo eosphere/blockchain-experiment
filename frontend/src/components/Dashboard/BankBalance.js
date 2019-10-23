@@ -1,23 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Typography, Box, CircularProgress } from '@material-ui/core';
-import Title from './Title';
-import { TOKEN_WALLET_CONTRACT } from 'utils';
+import { Typography } from '@material-ui/core';
 import { setBalance } from 'store/account';
+import { TOKEN_WALLET_CONTRACT } from 'utils';
+import Title from './Title';
+import Loading from 'components/Loading';
 
 class BankBalance extends React.PureComponent {
   state = {
     loading: true
   };
 
-  async componentDidMount() {
+  async fetchBalance() {
+    const { wallet, setBalance } = this.props;
     const {
-      wallet,
-      wallet: {
-        accountInfo: { account_name: accountName }
-      },
-      setBalance
-    } = this.props;
+      accountInfo: { account_name: accountName }
+    } = wallet;
     try {
       const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
         json: true,
@@ -36,31 +34,27 @@ class BankBalance extends React.PureComponent {
     }
   }
 
+  async componentDidMount() {
+    this.fetchBalance();
+  }
+
   render() {
     const { loading } = this.state;
     const { bankBalance } = this.props;
+
+    if (loading) {
+      return <Loading />;
+    }
+
     return (
       <>
-        {!loading ? (
-          <>
-            <Title>External Wallet Balance</Title>
-            <Typography component="span" variant="h5">
-              <strong>
-                {bankBalance && bankBalance.includes('AUD') && '$ '}
-                {bankBalance || `$ 0 AUD`}
-              </strong>
-            </Typography>
-          </>
-        ) : (
-          <Box
-            flexGrow="1"
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-            justifyContent="center">
-            <CircularProgress />
-          </Box>
-        )}
+        <Title>External Wallet Balance</Title>
+        <Typography component="span" variant="h5">
+          <strong>
+            {bankBalance && bankBalance.includes('AUD') && '$ '}
+            {bankBalance || `$ 0 AUD`}
+          </strong>
+        </Typography>
       </>
     );
   }

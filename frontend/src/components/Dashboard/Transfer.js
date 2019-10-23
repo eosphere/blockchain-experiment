@@ -12,9 +12,8 @@ import {
 import { TOKEN_SMARTCONTRACT, TOKEN_WALLET_CONTRACT } from 'utils';
 import { Message } from 'components/Shared';
 import TransferForm from './TransferForm';
-import { useHistory } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
-import { setBalance, refreshDashoard } from 'store/account';
+import { connect } from 'react-redux';
+import { setBalance } from 'store/account';
 
 const TransferDialog = ({
   success,
@@ -29,13 +28,8 @@ const TransferDialog = ({
   values,
   title
 }) => {
-  let history = useHistory();
-  const dispatch = useDispatch();
   const refresh = () => {
-    dispatch(refreshDashoard('transfer'));
     toggleDialog();
-    history.push('/loading');
-    history.goBack();
   };
   return (
     <Dialog
@@ -143,30 +137,31 @@ class Transfer extends React.PureComponent {
 
   async fetchBalances() {
     const { wallet, accountName, setBalance } = this.props;
-    const { rows: balances } = await wallet.eosApi.rpc.get_table_rows({
+    const { rows: walletBalances = [] } = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_SMARTCONTRACT,
       scope: accountName,
       table: 'balances'
     });
-    const { rows: accounts } = await wallet.eosApi.rpc.get_table_rows({
+    const walletAccount = walletBalances.find(balance => balance.funds.includes('AUD'));
+    const walletBalance = walletAccount ? walletAccount.funds : '0 AUD';
+
+    // Bank / Reward balance
+    const { rows: rewardAccounts = [] } = await wallet.eosApi.rpc.get_table_rows({
       json: true,
       code: TOKEN_WALLET_CONTRACT,
       scope: accountName,
       table: 'accounts'
     });
-    const { rows: bankBalances } = await wallet.eosApi.rpc.get_table_rows({
-      json: true,
-      code: TOKEN_WALLET_CONTRACT,
-      scope: accountName,
-      table: 'accounts'
-    });
-    const { balance: bankBalance } = bankBalances.find(row => row.balance.includes('AUD'));
-    const { funds } = balances.find(row => row.funds.includes('AUD'));
-    const { balance: tokenBalance } = accounts.find(row => row.balance.includes('LOTT'));
+    const rewardAccount = rewardAccounts.find(account => account.balance.includes('LOTT'));
+    const rewardBalance = rewardAccount ? rewardAccount.balance : '0 LOTT';
+
+    const bankAccount = rewardAccounts.find(account => account.balance.includes('AUD'));
+    const bankBalance = bankAccount ? bankAccount.balance : '0 AUD';
+
     setBalance(bankBalance, 'bank');
-    setBalance(tokenBalance, 'reward');
-    setBalance(funds, 'wallet');
+    setBalance(rewardBalance, 'reward');
+    setBalance(walletBalance, 'wallet');
   }
 
   async Transfer() {
