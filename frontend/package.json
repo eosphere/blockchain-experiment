@@ -16,7 +16,7 @@
     "eos-transit-scatter-provider": "^4.0.1",
     "eosjs": "^20.0.0",
     "husky": "^3.0.8",
-    "immer": "^4.0.1",
+    "immer": "^8.0.1",
     "lint-staged": "^9.4.1",
     "moment": "^2.24.0",
     "prettier": "^1.18.2",
